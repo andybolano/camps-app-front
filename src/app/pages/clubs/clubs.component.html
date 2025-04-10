@@ -1,0 +1,113 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>Clubes - {{ campName }}</h2>
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <button class="btn btn-secondary" routerLink="/camps">
+        Volver a Campamentos
+      </button>
+      <button
+        class="btn btn-success"
+        [routerLink]="['/camps', campId, 'clubs', 'new']"
+      >
+        Nuevo Club
+      </button>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && clubs.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Escudo</th>
+          <th>Nombre</th>
+          <th>Ciudad</th>
+          <th>Guías Bautizados</th>
+          <th>Guías No Bautizados</th>
+          <th>Guías Menores</th>
+          <th>Total Guías</th>
+          <th>Inscripción</th>
+          <th>Pagado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let club of clubs">
+          <td class="text-center">
+            <div *ngIf="club.shieldUrl" class="club-shield">
+              <img 
+                [src]="club.shieldUrl" 
+                alt="Shield" 
+                class="img-thumbnail" 
+                style="max-height: 40px;"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display: none;" class="club-no-shield">
+                <i class="bi bi-shield" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+            <div *ngIf="!club.shieldUrl" class="club-no-shield">
+              <i class="bi bi-shield" style="font-size: 1.5rem;"></i>
+            </div>
+          </td>
+          <td>{{ club.name }}</td>
+          <td>{{ club.city }}</td>
+          <td>{{ club.participantsCount }}</td>
+          <td>{{ club.guestsCount }}</td>
+          <td>{{ club.minorsCount || 0 }}</td>
+          <td>
+            {{ club.participantsCount + club.guestsCount + club.minorsCount }}
+          </td>
+          <td>{{ club.registrationFee | currency }}</td>
+          <td>
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-check-circle-fill text-success': club.isPaid,
+                'bi-x-circle-fill text-danger': !club.isPaid
+              }"
+            ></i>
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                [routerLink]="['/camps', campId, 'clubs', club.id]"
+                title="Ver detalles y resultados del club"
+              >
+                <i class="bi bi-eye"></i> Ver Detalles
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                [routerLink]="['/camps', campId, 'clubs', club.id, 'edit']"
+              >
+                <i class="bi bi-pencil"></i> Editar
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onDeleteClub(club.id)"
+              >
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && clubs.length === 0" class="alert alert-info">
+      No hay clubes registrados para este campamento. Haga clic en "Nuevo Club"
+      para comenzar.
+    </div>
+  </div>
+</div>

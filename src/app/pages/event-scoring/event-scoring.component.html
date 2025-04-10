@@ -1,0 +1,382 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 mb-4">
+      <h2>Calificar Evento</h2>
+      <h5 *ngIf="event" class="text-muted">{{ event.name }}</h5>
+      <button class="btn btn-primary" (click)="goBack()">
+        &laquo; Volver a Eventos
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="col-12 text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="col-12">
+      <div class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="col-12">
+      <div class="alert alert-success">
+        {{ successMessage }}
+      </div>
+    </div>
+
+    <!-- Layout de 2 columnas cuando no está cargando y hay un evento -->
+    <div *ngIf="!isLoading && event" class="row">
+      <!-- Columna principal - Formulario de calificación -->
+      <div class="col-md-8 col-lg-9">
+        <form [formGroup]="scoringForm" (ngSubmit)="onSubmit()">
+          <!-- Selección de club -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Seleccionar Club</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="clubId" class="form-label">Club*</label>
+                <select
+                  class="form-select"
+                  id="clubId"
+                  formControlName="clubId"
+                  [class.is-invalid]="
+                    scoringForm.get('clubId')?.invalid &&
+                    scoringForm.get('clubId')?.touched
+                  "
+                >
+                  <option [ngValue]="null">-- Seleccione un club --</option>
+                  <option *ngFor="let club of clubs" [ngValue]="club.id">
+                    {{ club.name }}
+                  </option>
+                </select>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="
+                    scoringForm.get('clubId')?.invalid &&
+                    scoringForm.get('clubId')?.touched
+                  "
+                >
+                  Debe seleccionar un club para calificar.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario de calificación para eventos regulares -->
+          <div
+            class="card mb-4"
+            *ngIf="
+              selectedClubId && event && event.type === 'REGULAR' && event.items && event.items.length > 0
+            "
+          >
+            <div class="card-header">
+              <h5 class="mb-0">
+                Calificaciones
+                <span *ngIf="existingResult" class="badge bg-info ms-2"
+                  >Ya calificado</span
+                >
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" *ngIf="existingResult">
+                Este club ya tiene calificaciones para este evento. Al guardar,
+                actualizará las calificaciones existentes.
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary mt-2"
+                  (click)="reloadExistingScores()"
+                >
+                  Recargar calificaciones
+                </button>
+              </div>
+
+              <div formGroupName="scores">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Ítem de Calificación</th>
+                      <th style="width: 150px">Porcentaje</th>
+                      <th style="width: 250px">Calificación (0-10)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of event?.items">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.percentage }}%</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="form-control"
+                          [formControlName]="
+                            item.id !== undefined ? item.id.toString() : ''
+                          "
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          [class.is-invalid]="
+                            item.id !== undefined &&
+                            scoringForm.get('scores')?.get(item.id.toString())
+                              ?.invalid &&
+                            scoringForm.get('scores')?.get(item.id.toString())
+                              ?.touched
+                          "
+                          (input)="calculateTotalScore()"
+                        />
+                        <div
+                          class="invalid-feedback"
+                          *ngIf="
+                            item.id !== undefined &&
+                            scoringForm.get('scores')?.get(item.id.toString())
+                              ?.invalid &&
+                            scoringForm.get('scores')?.get(item.id.toString())
+                              ?.touched
+                          "
+                        >
+                          La calificación debe ser entre 0 y 10.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="table-primary fw-bold">
+                      <td>Puntuación Total</td>
+                      <td>100%</td>
+                      <td>{{ totalScore | number: '1.1-1' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario de calificación para eventos basados en miembros -->
+          <div
+            class="card mb-4"
+            *ngIf="
+              selectedClubId && event && event.type === 'MEMBER_BASED' && event.memberBasedItems && event.memberBasedItems.length > 0
+            "
+          >
+            <div class="card-header">
+              <h5 class="mb-0">
+                Calificaciones Basadas en Características de Miembros
+                <span *ngIf="existingResult" class="badge bg-info ms-2"
+                  >Ya calificado</span
+                >
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" *ngIf="existingResult">
+                Este club ya tiene calificaciones para este evento. Al guardar,
+                actualizará las calificaciones existentes.
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary mt-2"
+                  (click)="reloadExistingScores()"
+                >
+                  Recargar calificaciones
+                </button>
+              </div>
+
+              <div class="alert alert-warning mb-4">
+                <h6>Instrucciones:</h6>
+                <ul class="mb-0">
+                  <li>Para cada ítem, indique el <strong>número de miembros que cumplen la característica</strong> y el <strong>total de miembros con esa característica</strong>.</li>
+                  <li>La calificación se calculará automáticamente como la proporción entre ambos valores.</li>
+                  <li>Por ejemplo, si hay 10 miembros bautizados y 7 de ellos traen su insignia, la calificación será 7/10 = 70%.</li>
+                  <li><strong>Nota: </strong>Los valores totales se han rellenado automáticamente con la suma de los datos del club para todas las características aplicables.</li>
+                </ul>
+              </div>
+
+              <div formGroupName="memberBasedScores">
+                <div class="row" *ngFor="let item of event?.memberBasedItems" class="mb-4 pb-4 border-bottom">
+                  <div class="col-12 mb-2">
+                    <h5>{{ item.name }} <small class="text-muted">({{ item.percentage }}%)</small></h5>
+                    <div class="text-muted mb-2">
+                      <small>Características aplicables: 
+                        <span class="badge bg-info me-1" *ngFor="let characteristic of item.applicableCharacteristics">
+                          {{ characteristic === 'minorsCount' ? 'Guias menores' : 
+                             characteristic === 'participantsCount' ? 'Guias bautizado' :
+                             characteristic === 'guestsCount' ? 'Guias no bautizados' :
+                             characteristic === 'economsCount' ? 'Economas' :
+                             characteristic === 'companionsCount' ? 'Acompañantes' : characteristic }}
+                        </span>
+                      </small>
+                    </div>
+                  </div>
+
+                  <div [formGroupName]="item.id !== undefined ? item.id.toString() : ''" class="col-12">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">Miembros que cumplen la característica</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          formControlName="matchCount"
+                          min="0"
+                          step="1"
+                          [class.is-invalid]="
+                            item.id !== undefined &&
+                            scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('matchCount')?.invalid &&
+                            scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('matchCount')?.touched
+                          "
+                          (input)="calculateTotalScore()"
+                        />
+                        <div class="invalid-feedback">
+                          Debe ser un número mayor o igual a 0.
+                        </div>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">Total de miembros con la característica</label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            formControlName="totalWithCharacteristic"
+                            [disabled]="true"
+                            min="0"
+                            step="1"
+                            [class.is-invalid]="
+                              item.id !== undefined &&
+                              scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('totalWithCharacteristic')?.invalid &&
+                              scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('totalWithCharacteristic')?.touched
+                            "
+                            (input)="calculateTotalScore()"
+                          />
+                          <div class="invalid-feedback">
+                            Debe ser un número mayor o igual a 0.
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="progress" style="height: 25px;">
+                          <div 
+                            class="progress-bar" 
+                            role="progressbar" 
+                            [ngStyle]="{
+                              width: getItemPercentage(item.id) + '%'
+                            }"
+                            [attr.aria-valuenow]="getItemPercentage(item.id)" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100"
+                          >
+                            {{ getItemPercentage(item.id) }}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-4">
+                  <div class="col-12">
+                    <div class="card bg-light">
+                      <div class="card-body">
+                        <h5 class="card-title">Puntuación Total</h5>
+                        <h2 class="display-6 text-primary">{{ totalScore | number: '1.1-1' }}</h2>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div
+            class="d-flex justify-content-end gap-2 mb-4"
+            *ngIf="
+              selectedClubId && event && (
+                (event.type === 'REGULAR' && event.items && event.items.length > 0) || 
+                (event.type === 'MEMBER_BASED' && event.memberBasedItems && event.memberBasedItems.length > 0)
+              )
+            "
+          >
+            <button type="button" class="btn btn-secondary" (click)="goBack()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="scoringForm.invalid"
+            >
+              Guardar Calificaciones
+            </button>
+          </div>
+        </form>
+
+        <!-- Mensaje si no hay ítems para calificar -->
+        <div
+          *ngIf="event && (!event.items || event.items.length === 0) && (!event.memberBasedItems || event.memberBasedItems.length === 0)"
+          class="alert alert-warning"
+        >
+          Este evento no tiene ítems de calificación definidos. Primero debe
+          agregar ítems en la planilla de calificación del evento.
+        </div>
+      </div>
+
+      <!-- Columna lateral - Ranking -->
+      <div class="col-md-4 col-lg-3">
+        <!-- Posición del club seleccionado -->
+        <div class="card sticky-top mb-3" *ngIf="selectedClubId && currentRank > 0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Club Seleccionado</h5>
+          </div>
+          <div class="card-body text-center">
+            <h6 class="mb-2">{{ getClubName(selectedClubId) }}</h6>
+            <h2 class="display-4 text-primary mb-0">
+              {{ currentRank }}<sup>{{ getRankSuffix(currentRank) }}</sup>
+            </h2>
+            <p class="text-muted mt-2">Posición actual</p>
+          </div>
+        </div>
+
+        <!-- Tabla de ranking -->
+        <div class="card mb-3" *ngIf="eventResults.length > 0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Ranking del Evento</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="alert alert-info m-3" *ngIf="!selectedClubId">
+              <i class="bi bi-info-circle me-2"></i>
+              Seleccione un club para calificarlo.
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center" style="width: 50px">Pos.</th>
+                    <th>Club</th>
+                    <th class="text-center" style="width: 80px">Puntos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let result of eventResults"
+                    [class.table-primary]="result.clubId === selectedClubId"
+                  >
+                    <td class="text-center fw-bold">
+                      <span 
+                        class="badge rounded-pill" 
+                        [ngClass]="getRankBadgeClass(result.rank)"
+                      >
+                        {{ result.rank }}
+                      </span>
+                    </td>
+                    <td>{{ result.club?.name || 'Sin nombre' }}</td>
+                    <td class="text-center fw-bold">{{ result.totalScore | number: '1.1-1' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

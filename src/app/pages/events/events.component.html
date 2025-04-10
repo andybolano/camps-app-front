@@ -1,0 +1,102 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>Eventos del Campamento</h2>
+    <div class="d-flex justify-content-between align-items-center">
+      <button class="btn btn-primary" (click)="goBack()">
+        &laquo; Volver a Campamentos
+      </button>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-info text-white"
+          [routerLink]="['/camps', campId, 'ranking']"
+        >
+          <i class="bi bi-trophy"></i> Ver Ranking General
+        </button>
+        <button
+          class="btn btn-success"
+          [routerLink]="['/camps', campId, 'events', 'new']"
+        >
+          Nuevo Evento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && events.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Planilla de Calificación</th>
+          <th>Calificar</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of events">
+          <td>{{ event.name }}</td>
+          <td>{{ event.description }}</td>
+          <td>
+            <span *ngIf="event.items && event.items.length > 0">
+              {{ event.items.length }} ítems de calificación ({{
+                getTotalPercentage(event)
+              }}% total)
+            </span>
+            <span *ngIf="!event.items || event.items.length === 0">
+              Sin ítems de calificación
+            </span>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-success"
+              [routerLink]="['/camps', campId, 'events', event.id, 'score']"
+              [disabled]="
+                !event.items ||
+                event.items.length === 0 &&
+                (!event.memberBasedItems ||
+                event.memberBasedItems.length === 0)
+              "
+            >
+              Calificar
+            </button>
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                [routerLink]="['/camps', campId, 'events', event.id, 'edit']"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onDeleteEvent(event.id)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && events.length === 0" class="alert alert-info">
+      No hay eventos registrados para este campamento. Haga clic en "Nuevo
+      Evento" para comenzar.
+    </div>
+  </div>
+</div>

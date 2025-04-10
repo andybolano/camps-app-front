@@ -1,0 +1,9 @@
+.btn-calificar {
+  font-weight: bold;
+  border-width: 2px;
+  color: #28a745;
+  &:hover {
+    background-color: #28a745;
+    color: white;
+  }
+}

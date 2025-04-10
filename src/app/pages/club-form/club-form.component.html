@@ -1,0 +1,297 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>{{ isEditMode ? 'Editar' : 'Nuevo' }} Club - {{ campName }}</h2>
+  </div>
+  <div class="col-md-12">
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="clubForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              formControlName="name"
+              required
+            />
+            <div
+              *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="name?.errors?.['required']"
+                >El nombre es requerido</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="city" class="form-label">Ciudad</label>
+            <input
+              type="text"
+              class="form-control"
+              id="city"
+              formControlName="city"
+              required
+            />
+            <div
+              *ngIf="city?.invalid && (city?.dirty || city?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="city?.errors?.['required']"
+                >La ciudad es requerida</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="participantsCount" class="form-label"
+              >Guías Bautizados</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="participantsCount"
+              formControlName="participantsCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                participantsCount?.invalid &&
+                (participantsCount?.dirty || participantsCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="participantsCount?.errors?.['required']"
+                >El número de guías bautizados es requerido</small
+              >
+              <small *ngIf="participantsCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="guestsCount" class="form-label">Guías No Bautizados</label>
+            <input
+              type="number"
+              class="form-control"
+              id="guestsCount"
+              formControlName="guestsCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                guestsCount?.invalid && (guestsCount?.dirty || guestsCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="guestsCount?.errors?.['required']"
+                >El número de guías no bautizados es requerido</small
+              >
+              <small *ngIf="guestsCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="minorsCount" class="form-label">Guías Menores</label>
+            <input
+              type="number"
+              class="form-control"
+              id="minorsCount"
+              formControlName="minorsCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                minorsCount?.invalid && (minorsCount?.dirty || minorsCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="minorsCount?.errors?.['required']"
+                >El número de guías menores es requerido</small
+              >
+              <small *ngIf="minorsCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="economsCount" class="form-label">Número de Ecónomas</label>
+            <input
+              type="number"
+              class="form-control"
+              id="economsCount"
+              formControlName="economsCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                economsCount?.invalid &&
+                (economsCount?.dirty || economsCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="economsCount?.errors?.['required']"
+                >El número de ecónomas es requerido</small
+              >
+              <small *ngIf="economsCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="companionsCount" class="form-label">Número de Acompañantes</label>
+            <input
+              type="number"
+              class="form-control"
+              id="companionsCount"
+              formControlName="companionsCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                companionsCount?.invalid &&
+                (companionsCount?.dirty || companionsCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="companionsCount?.errors?.['required']"
+                >El número de acompañantes es requerido</small
+              >
+              <small *ngIf="companionsCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="registrationFee" class="form-label"
+              >Valor de Inscripción</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="registrationFee"
+              formControlName="registrationFee"
+              min="0"
+              step="0.01"
+              required
+            />
+            <div
+              *ngIf="
+                registrationFee?.invalid &&
+                (registrationFee?.dirty || registrationFee?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="registrationFee?.errors?.['required']"
+                >El valor de inscripción es requerido</small
+              >
+              <small *ngIf="registrationFee?.errors?.['min']"
+                >El valor debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="isPaid"
+              formControlName="isPaid"
+              (change)="onIsPaidChange($event)"
+            />
+            <label class="form-check-label" for="isPaid">Pagado</label>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="shield" class="form-label">Escudo del Club</label>
+            
+            <!-- Previsualización de escudo -->
+            <div class="mb-3 text-center">
+              <div *ngIf="shieldPreview" class="mb-2">
+                <img [src]="shieldPreview" alt="Escudo Preview" class="img-thumbnail" style="max-height: 200px;">
+              </div>
+              <div *ngIf="!shieldPreview && currentShield" class="mb-2">
+                <img [src]="currentShield" alt="Escudo Actual" class="img-thumbnail" style="max-height: 200px;" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display: none;" class="alert alert-warning">Error al cargar la imagen</div>
+                <p class="small text-muted mt-1">Escudo actual</p>
+              </div>
+              <div *ngIf="!shieldPreview && !currentShield" class="border p-3 mb-2 text-center text-muted">
+                <img src="assets/shield-icon.png" alt="No Shield" style="max-height: 60px; opacity: 0.5;">
+                <p>No hay escudo</p>
+              </div>
+            </div>
+            
+            <!-- Input para seleccionar archivo -->
+            <div class="d-grid gap-2">
+              <label for="shield" class="btn btn-outline-primary">
+                <i class="bi bi-upload me-2"></i>Seleccionar escudo
+              </label>
+              <input
+                type="file"
+                class="form-control visually-hidden"
+                id="shield"
+                accept="image/*"
+                (change)="onShieldChange($event)"
+              />
+            </div>
+            <div class="form-text text-center">Formatos: JPG, PNG (máx 2MB)</div>
+            
+            <!-- Botón para limpiar escudo -->
+            <div class="d-grid mt-2">
+              <button 
+                *ngIf="shieldPreview" 
+                type="button" 
+                class="btn btn-sm btn-outline-danger" 
+                (click)="clearShield()"
+              >
+                <i class="bi bi-x-circle me-2"></i>Quitar escudo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button
+          type="submit"
+          [disabled]="clubForm.invalid || isLoading"
+          class="btn btn-primary"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Guardar
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          [routerLink]="['/camps', campId, 'clubs']"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
