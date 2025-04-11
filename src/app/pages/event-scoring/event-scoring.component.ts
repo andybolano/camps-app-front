@@ -184,7 +184,11 @@ export class EventScoringComponent implements OnInit {
       );
       scoresGroup.addControl(
         item.id!.toString(),
-        this.fb.control(0, [Validators.required, Validators.min(0)])
+        this.fb.control(0, [
+          Validators.required,
+          Validators.min(0),
+          Validators.max(this.event?.maxScore ?? 100),
+        ])
       );
     });
 
@@ -566,87 +570,82 @@ export class EventScoringComponent implements OnInit {
 
   // Método para calcular la puntuación total
   calculateTotalScore(): number {
-    // Inicializar puntuación total
-    let total = 0;
+    if (!this.event) return 0;
 
-    // Obtener el tipo de evento
-    const eventType = this.event?.type || 'REGULAR';
+    if (this.event.type === 'REGULAR') {
+      const scores = this.scoringForm.get('scores')?.value;
+      if (!scores) return 0;
 
-    if (eventType === 'REGULAR') {
-      // Calcular para eventos regulares
-      if (
-        this.event?.items &&
-        this.event.items.length > 0 &&
-        this.scoringForm
-      ) {
-        const scoresGroup = this.scoringForm.get('scores') as FormGroup;
-        if (!scoresGroup) {
-          console.warn('No se encontró el grupo de scores en el formulario');
-          return 0;
-        }
-
-        for (const item of this.event.items) {
-          if (item.id) {
-            const control = scoresGroup.get(item.id.toString());
-            if (control) {
-              const score = parseFloat(control.value) || 0;
-              total += score;
-            }
+      let total = 0;
+      for (const [itemId, score] of Object.entries(scores)) {
+        const item = this.event.items?.find((i) => i.id?.toString() === itemId);
+        if (item) {
+          // Asegurarse de que el score sea un número válido
+          const numericScore = Number(score);
+          if (!isNaN(numericScore) && numericScore >= 0) {
+            // Para eventos regulares, simplemente sumamos el puntaje
+            total += numericScore;
           }
         }
       }
-    } else if (eventType === 'MEMBER_BASED') {
-      // Calcular para eventos basados en miembros
-      if (
-        this.event?.memberBasedItems &&
-        this.event.memberBasedItems.length > 0 &&
-        this.scoringForm
-      ) {
-        const memberBasedScoresGroup = this.scoringForm.get(
-          'memberBasedScores',
-        ) as FormGroup;
 
-        if (!memberBasedScoresGroup) {
-          console.warn(
-            'No se encontró el grupo de memberBasedScores en el formulario',
-          );
-          return 0;
-        }
+      // Redondear el total a 2 decimales
+      total = Math.round(total * 100) / 100;
 
-        for (const item of this.event.memberBasedItems) {
-          if (item.id) {
-            const itemGroup = memberBasedScoresGroup.get(item.id.toString());
+      // Validar que el total no exceda el puntaje máximo
+      const maxScore = this.event.maxScore || 100;
+      if (total > maxScore) {
+        this.errorMessage = `La puntuación total (${total.toFixed(
+          2
+        )}) no puede exceder el puntaje máximo del evento (${maxScore})`;
+      } else {
+        this.errorMessage = '';
+      }
 
-            if (itemGroup) {
-              const matchCount =
-                parseFloat(itemGroup.get('matchCount')?.value) || 0;
-              const totalWithChar =
-                parseFloat(itemGroup.get('totalWithCharacteristic')?.value) ||
-                0;
+      this.totalScore = total;
+      return this.totalScore;
+    } else if (this.event.type === 'MEMBER_BASED') {
+      const memberBasedScores =
+        this.scoringForm.get('memberBasedScores')?.value;
+      if (!memberBasedScores) return 0;
 
-              // Evitar división por cero
-              let proportion = 0;
-              if (totalWithChar > 0) {
-                proportion = matchCount / totalWithChar;
-              }
-
-              // Escala a 0-10
-              const score = proportion * 10;
-              total += score;
-            }
+      let total = 0;
+      for (const [itemId, itemData] of Object.entries(memberBasedScores)) {
+        const item = this.event.memberBasedItems?.find(
+          (i) => i.id?.toString() === itemId
+        );
+        if (item) {
+          const data = itemData as {
+            matchCount: number;
+            totalWithCharacteristic: number;
+          };
+          if (data.totalWithCharacteristic > 0) {
+            const percentage =
+              (data.matchCount / data.totalWithCharacteristic) * 100;
+            const itemScore = (percentage * item.percentage) / 100;
+            total += itemScore;
           }
         }
       }
+
+      // Redondear el total a 2 decimales
+      total = Math.round(total * 100) / 100;
+
+      // Validar que el total no exceda el puntaje máximo
+      const maxScore = this.event.maxScore || 100;
+      if (total > maxScore) {
+        this.errorMessage = `La puntuación total (${total.toFixed(
+          2
+        )}) no puede exceder el puntaje máximo del evento (${maxScore})`;
+      } else {
+        this.errorMessage = '';
+      }
+
+      this.totalScore = total;
+      return this.totalScore;
     }
 
-    // Redondear a 2 decimales
-    total = parseFloat(total.toFixed(2));
-    console.log(`Puntuación total calculada: ${total}`);
-
-    // Actualizar propiedad para mostrar en UI
-    this.totalScore = total;
-
-    return total;
+    return 0;
   }
 
   // Método para obtener el sufijo del ranking (1st, 2nd, 3rd, etc.)

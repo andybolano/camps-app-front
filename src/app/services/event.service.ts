@@ -9,6 +9,7 @@ export interface Event {
   description: string;
   type?: 'REGULAR' | 'MEMBER_BASED';
   date?: string;
+  maxScore?: number;
   camp: {
     id: number;
     name?: string;

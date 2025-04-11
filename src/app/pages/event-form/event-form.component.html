@@ -57,6 +57,33 @@
             </div>
 
             <div class="mb-3">
+              <label for="maxScore" class="form-label">Puntaje Máximo*</label>
+              <input
+                type="number"
+                class="form-control"
+                id="maxScore"
+                formControlName="maxScore"
+                min="1"
+                step="0.01"
+                required
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  eventForm.get('maxScore')?.invalid &&
+                  eventForm.get('maxScore')?.touched
+                "
+              >
+                <div *ngIf="eventForm.get('maxScore')?.errors?.['required']">
+                  El puntaje máximo es obligatorio.
+                </div>
+                <div *ngIf="eventForm.get('maxScore')?.errors?.['min']">
+                  El puntaje máximo debe ser mayor que 0.
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
               <label for="type" class="form-label">Tipo de Evento*</label>
               <select
                 class="form-select"

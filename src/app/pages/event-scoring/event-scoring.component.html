@@ -31,6 +31,25 @@
       <!-- Columna principal - Formulario de calificación -->
       <div class="col-md-8 col-lg-9">
         <form [formGroup]="scoringForm" (ngSubmit)="onSubmit()">
+          <!-- Información del evento -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Información del Evento</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <p><strong>Nombre:</strong> {{ event.name }}</p>
+                  <p><strong>Tipo:</strong> {{ event.type === 'REGULAR' ? 'Regular' : 'Basado en Características' }}</p>
+                </div>
+                <div class="col-md-6">
+                  <p><strong>Puntaje Máximo:</strong> {{ event.maxScore || 100 }}</p>
+                  <p *ngIf="event.description"><strong>Descripción:</strong> {{ event.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Selección de club -->
           <div class="card mb-4">
             <div class="card-header">
@@ -82,69 +101,79 @@
               </h5>
             </div>
             <div class="card-body">
-              <div class="alert alert-info" *ngIf="existingResult">
-                Este club ya tiene calificaciones para este evento. Al guardar,
-                actualizará las calificaciones existentes.
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary mt-2"
-                  (click)="reloadExistingScores()"
-                >
-                  Recargar calificaciones
-                </button>
+              <div formGroupName="scores">
+                <div *ngFor="let item of event.items" class="mb-3">
+                  <label [for]="'score_' + item.id" class="form-label"
+                    >{{ item.name }}</label>
+                  <input
+                    type="number"
+                    [id]="'score_' + item.id"
+                    class="form-control"
+                    [formControlName]="item.id!.toString()"
+                    [class.is-invalid]="
+                      scoringForm.get('scores')?.get(item.id!.toString())
+                        ?.invalid &&
+                      scoringForm.get('scores')?.get(item.id!.toString())
+                        ?.touched
+                    "
+                    min="0"
+                    [max]="event.maxScore || 100"
+                    step="0.01"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="
+                      scoringForm.get('scores')?.get(item.id!.toString())
+                        ?.invalid &&
+                      scoringForm.get('scores')?.get(item.id!.toString())
+                        ?.touched
+                    "
+                  >
+                    <div
+                      *ngIf="
+                        scoringForm
+                          .get('scores')
+                          ?.get(item.id!.toString())
+                          ?.errors?.['required']
+                      "
+                    >
+                      La calificación es requerida
+                    </div>
+                    <div
+                      *ngIf="
+                        scoringForm
+                          .get('scores')
+                          ?.get(item.id!.toString())
+                          ?.errors?.['min']
+                      "
+                    >
+                      La calificación no puede ser menor a 0
+                    </div>
+                    <div
+                      *ngIf="
+                        scoringForm
+                          .get('scores')
+                          ?.get(item.id!.toString())
+                          ?.errors?.['max']
+                      "
+                    >
+                      La calificación no puede exceder el puntaje máximo del evento ({{ event.maxScore || 100 }})
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div formGroupName="scores">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Ítem de Calificación</th>
-                      <th style="width: 250px">Calificación</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of event?.items">
-                      <td>{{ item.name }}</td>
-                      <td>
-                        <input
-                          type="number"
-                          class="form-control"
-                          [formControlName]="
-                            item.id !== undefined ? item.id.toString() : ''
-                          "
-                          min="0"
-                          step="0.1"
-                          [class.is-invalid]="
-                            item.id !== undefined &&
-                            scoringForm.get('scores')?.get(item.id.toString())
-                              ?.invalid &&
-                            scoringForm.get('scores')?.get(item.id.toString())
-                              ?.touched
-                          "
-                          (input)="calculateTotalScore()"
-                        />
-                        <div
-                          class="invalid-feedback"
-                          *ngIf="
-                            item.id !== undefined &&
-                            scoringForm.get('scores')?.get(item.id.toString())
-                              ?.invalid &&
-                            scoringForm.get('scores')?.get(item.id.toString())
-                              ?.touched
-                          "
-                        >
-                          La calificación debe ser mayor o igual a 0.
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr class="table-primary fw-bold">
-                      <td>Puntuación Total</td>
-                      <td>{{ totalScore }}</td>
-                    </tr>
-                  </tfoot>
-                </table>
+              <!-- Puntuación total -->
+              <div class="mt-4">
+                <h5>
+                  Puntuación Total:
+                  <span class="badge" [ngClass]="getRankBadgeClass(1)">
+                    {{ totalScore }}
+                  </span>
+                </h5>
+                <div *ngIf="errorMessage" class="alert alert-danger mt-2">
+                  {{ errorMessage }}
+                </div>
               </div>
             </div>
           </div>

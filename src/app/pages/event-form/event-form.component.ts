@@ -72,6 +72,7 @@ export class EventFormComponent implements OnInit {
       name: ['', [Validators.required]],
       description: [''],
       type: ['REGULAR', [Validators.required]],
+      maxScore: [100, [Validators.required, Validators.min(1)]],
       items: this.fb.array([]),
       memberBasedItems: this.fb.array([]),
     });
@@ -106,6 +107,7 @@ export class EventFormComponent implements OnInit {
           name: event.name,
           description: event.description,
           type: event.type || 'REGULAR',
+          maxScore: event.maxScore || 100,
         });
 
         // Cargar los items regulares
