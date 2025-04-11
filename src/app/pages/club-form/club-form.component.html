@@ -179,6 +179,58 @@
           </div>
 
           <div class="mb-3">
+            <label for="directorCount" class="form-label">Director de Club</label>
+            <input
+              type="number"
+              class="form-control"
+              id="directorCount"
+              formControlName="directorCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                directorCount?.invalid &&
+                (directorCount?.dirty || directorCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="directorCount?.errors?.['required']"
+                >El número de directores es requerido</small
+              >
+              <small *ngIf="directorCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="pastorCount" class="form-label">Pastor</label>
+            <input
+              type="number"
+              class="form-control"
+              id="pastorCount"
+              formControlName="pastorCount"
+              min="0"
+              required
+            />
+            <div
+              *ngIf="
+                pastorCount?.invalid &&
+                (pastorCount?.dirty || pastorCount?.touched)
+              "
+              class="text-danger"
+            >
+              <small *ngIf="pastorCount?.errors?.['required']"
+                >El número de pastores es requerido</small
+              >
+              <small *ngIf="pastorCount?.errors?.['min']"
+                >El número debe ser mayor o igual a 0</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
             <label for="registrationFee" class="form-label"
               >Valor de Inscripción</label
             >

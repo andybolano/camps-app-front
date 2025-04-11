@@ -51,13 +51,14 @@
                   <span><strong>Guías No Bautizados:</strong></span>
                   <span>{{ club.guestsCount }}</span>
                 </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <span><strong>Guías Menores:</strong></span>
-                  <span>{{ club.minorsCount || 0 }}</span>
-                </li>
+               
                  <li class="list-group-item d-flex justify-content-between" style="background-color: #f0f0f0;">
                   <span><strong>Total Guías:</strong></span>
-                  <span>{{ club.minorsCount + club.guestsCount + (club.participantsCount || 0) }}</span>
+                  <span>{{ club.minorsCount + club.guestsCount  }}</span>
+                </li>
+                 <li class="list-group-item d-flex justify-content-between">
+                  <span><strong>Guías Menores:</strong></span>
+                  <span>{{ club.minorsCount || 0 }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                   <span><strong>Ecónomas:</strong></span>
@@ -67,9 +68,13 @@
                   <span><strong>Acompañantes:</strong></span>
                   <span>{{ club.companionsCount }}</span>
                 </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span><strong>Pastores:</strong></span>
+                  <span>{{ club.pastorCount }}</span>
+                </li>
                 <li class="list-group-item d-flex justify-content-between" style="background-color: #f0f0f0;">
                   <span><strong>Total Acampantes:</strong></span>
-                  <span>{{ club.participantsCount + club.guestsCount + (club.minorsCount || 0) + club.economsCount + club.companionsCount }}</span>
+                  <span>{{ club.participantsCount + club.guestsCount  + club.economsCount + club.companionsCount + club.pastorCount}}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                   <span><strong>Inscripción:</strong></span>

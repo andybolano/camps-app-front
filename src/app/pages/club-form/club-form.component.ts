@@ -35,7 +35,7 @@ export class ClubFormComponent implements OnInit {
     private clubService: ClubService,
     private campService: CampService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +68,8 @@ export class ClubFormComponent implements OnInit {
       minorsCount: [0, [Validators.required, Validators.min(0)]],
       economsCount: [0, [Validators.required, Validators.min(0)]],
       companionsCount: [0, [Validators.required, Validators.min(0)]],
+      directorCount: [0, [Validators.required, Validators.min(0)]],
+      pastorCount: [0, [Validators.required, Validators.min(0)]],
       registrationFee: [0, [Validators.required, Validators.min(0)]],
       isPaid: [false],
     });
@@ -97,6 +99,8 @@ export class ClubFormComponent implements OnInit {
           minorsCount: club.minorsCount || 0,
           economsCount: club.economsCount,
           companionsCount: club.companionsCount || 0,
+          directorCount: club.directorCount || 0,
+          pastorCount: club.pastorCount || 0,
           registrationFee: club.registrationFee,
           isPaid: club.isPaid,
         });
@@ -211,6 +215,12 @@ export class ClubFormComponent implements OnInit {
   }
   get companionsCount() {
     return this.clubForm.get('companionsCount');
+  }
+  get directorCount() {
+    return this.clubForm.get('directorCount');
+  }
+  get pastorCount() {
+    return this.clubForm.get('pastorCount');
   }
   get registrationFee() {
     return this.clubForm.get('registrationFee');

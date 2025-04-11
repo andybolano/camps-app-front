@@ -19,6 +19,8 @@ export interface Club {
   minorsCount: number;
   economsCount: number;
   companionsCount: number;
+  directorCount: number;
+  pastorCount: number;
   registrationFee: number;
   isPaid: boolean;
   shieldUrl?: string;
@@ -37,6 +39,8 @@ export interface CreateClubDto {
   minorsCount: number;
   economsCount: number;
   companionsCount: number;
+  directorCount: number;
+  pastorCount: number;
   registrationFee: number;
   isPaid?: boolean;
   shieldUrl?: string;
@@ -91,6 +95,8 @@ export class ClubService {
     formData.append('minorsCount', club.minorsCount.toString());
     formData.append('economsCount', club.economsCount.toString());
     formData.append('companionsCount', club.companionsCount.toString());
+    formData.append('directorCount', club.directorCount.toString());
+    formData.append('pastorCount', club.pastorCount.toString());
     formData.append('registrationFee', club.registrationFee.toString());
     formData.append('campId', club.campId.toString());
 
@@ -113,7 +119,7 @@ export class ClubService {
   updateClub(
     id: number,
     club: Partial<CreateClubDto>,
-    shield?: File,
+    shield?: File
   ): Observable<Club> {
     const formData = new FormData();
 
@@ -130,6 +136,10 @@ export class ClubService {
       formData.append('economsCount', club.economsCount.toString());
     if (club.companionsCount !== undefined)
       formData.append('companionsCount', club.companionsCount.toString());
+    if (club.directorCount !== undefined)
+      formData.append('directorCount', club.directorCount.toString());
+    if (club.pastorCount !== undefined)
+      formData.append('pastorCount', club.pastorCount.toString());
     if (club.registrationFee !== undefined)
       formData.append('registrationFee', club.registrationFee.toString());
     if (club.isPaid !== undefined)

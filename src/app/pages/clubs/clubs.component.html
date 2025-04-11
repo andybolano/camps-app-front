@@ -32,7 +32,6 @@
           <th>Ciudad</th>
           <th>Guías Bautizados</th>
           <th>Guías No Bautizados</th>
-          <th>Guías Menores</th>
           <th>Total Guías</th>
           <th>Inscripción</th>
           <th>Pagado</th>
@@ -61,9 +60,8 @@
           <td>{{ club.city }}</td>
           <td>{{ club.participantsCount }}</td>
           <td>{{ club.guestsCount }}</td>
-          <td>{{ club.minorsCount || 0 }}</td>
           <td>
-            {{ club.participantsCount + club.guestsCount + club.minorsCount }}
+            {{ club.participantsCount + club.guestsCount }}
           </td>
           <td>{{ club.registrationFee | currency }}</td>
           <td>
