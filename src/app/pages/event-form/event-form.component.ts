@@ -36,6 +36,8 @@ export class EventFormComponent implements OnInit {
     { value: 'guestsCount', label: 'Guias no bautizados' },
     { value: 'companionsCount', label: 'Acompañantes' },
     { value: 'economsCount', label: 'Economas' },
+    { value: 'directorCount', label: 'Director de club' },
+    { value: 'pastorCount', label: 'Pastor' },
   ];
 
   constructor(
