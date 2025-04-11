@@ -44,7 +44,7 @@ export class EventScoringComponent implements OnInit {
     private clubService: ClubService,
     private resultService: ResultService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +91,7 @@ export class EventScoringComponent implements OnInit {
         this.selectedClubId = clubId;
         this.checkExistingResult(this.eventId, clubId);
         this.updateCurrentRank(); // Actualizar el ranking cuando cambia el club
-        
+
         // Si es evento basado en miembros, actualizar con datos del club
         if (this.event?.type === 'MEMBER_BASED') {
           this.loadClubData(clubId);
@@ -173,14 +173,14 @@ export class EventScoringComponent implements OnInit {
 
     console.log(
       'Construyendo formulario con items regulares:',
-      this.event.items,
+      this.event.items
     );
     const scoresGroup = this.fb.group({});
 
     // Crear un control para cada ítem del evento
     this.event.items.forEach((item) => {
       console.log(
-        `Añadiendo control para item id=${item.id}, nombre=${item.name}`,
+        `Añadiendo control para item id=${item.id}, nombre=${item.name}`
       );
       scoresGroup.addControl(
         item.id!.toString(),
@@ -195,7 +195,7 @@ export class EventScoringComponent implements OnInit {
     this.scoringForm.setControl('scores', scoresGroup);
     console.log(
       'Formulario para items regulares construido:',
-      this.scoringForm.value,
+      this.scoringForm.value
     );
   }
 
@@ -206,14 +206,14 @@ export class EventScoringComponent implements OnInit {
       this.event.memberBasedItems.length === 0
     ) {
       console.warn(
-        'No hay items basados en miembros para construir el formulario',
+        'No hay items basados en miembros para construir el formulario'
       );
       return;
     }
 
     console.log(
       'Construyendo formulario con items basados en miembros:',
-      this.event.memberBasedItems,
+      this.event.memberBasedItems
     );
 
     // Crear grupo para los scores regulares (vacío en este caso)
@@ -226,7 +226,7 @@ export class EventScoringComponent implements OnInit {
     // Crear un control para cada ítem basado en miembros
     this.event.memberBasedItems.forEach((item) => {
       console.log(
-        `Añadiendo control para item basado en miembros id=${item.id}, nombre=${item.name}`,
+        `Añadiendo control para item basado en miembros id=${item.id}, nombre=${item.name}`
       );
 
       // Crear un grupo para cada item con controles para matchCount y totalWithCharacteristic
@@ -245,7 +245,7 @@ export class EventScoringComponent implements OnInit {
     this.scoringForm.setControl('memberBasedScores', memberBasedScoresGroup);
     console.log(
       'Formulario para items basados en miembros construido:',
-      this.scoringForm.value,
+      this.scoringForm.value
     );
   }
 
@@ -271,7 +271,7 @@ export class EventScoringComponent implements OnInit {
     }
 
     const result = this.eventResults.find(
-      (r) => r.clubId === this.selectedClubId,
+      (r) => r.clubId === this.selectedClubId
     );
     this.currentRank = result?.rank || 0;
   }
@@ -279,7 +279,7 @@ export class EventScoringComponent implements OnInit {
   private checkExistingResult(eventId: number, clubId: number): void {
     if (!eventId || !clubId) {
       console.warn(
-        'No se pueden verificar resultados sin eventId y clubId válidos',
+        'No se pueden verificar resultados sin eventId y clubId válidos'
       );
       return;
     }
@@ -295,7 +295,7 @@ export class EventScoringComponent implements OnInit {
     this.errorMessage = '';
 
     console.log(
-      `Verificando resultados existentes para evento=${eventId}, club=${clubId}`,
+      `Verificando resultados existentes para evento=${eventId}, club=${clubId}`
     );
     this.resultService.getResultByEventAndClub(eventId, clubId).subscribe({
       next: (results) => {
@@ -329,7 +329,7 @@ export class EventScoringComponent implements OnInit {
 
     console.log(
       'Intentando cargar resultado existente al formulario:',
-      this.existingResult,
+      this.existingResult
     );
 
     // Obtener el tipo de evento
@@ -349,12 +349,12 @@ export class EventScoringComponent implements OnInit {
           const control = scoresGroup.get(score.eventItemId.toString());
           if (control) {
             console.log(
-              `Asignando valor ${score.score} al control del item ${score.eventItemId}`,
+              `Asignando valor ${score.score} al control del item ${score.eventItemId}`
             );
             control.setValue(score.score);
           } else {
             console.warn(
-              `No se encontró el control para el item ${score.eventItemId}`,
+              `No se encontró el control para el item ${score.eventItemId}`
             );
           }
         });
@@ -371,11 +371,11 @@ export class EventScoringComponent implements OnInit {
         this.existingResult.memberBasedScores.length > 0
       ) {
         const memberBasedScoresGroup = this.scoringForm.get(
-          'memberBasedScores',
+          'memberBasedScores'
         ) as FormGroup;
         if (!memberBasedScoresGroup) {
           console.error(
-            'No se encontró el grupo de memberBasedScores en el formulario',
+            'No se encontró el grupo de memberBasedScores en el formulario'
           );
           return;
         }
@@ -383,11 +383,11 @@ export class EventScoringComponent implements OnInit {
         // Procesar cada score basado en miembros
         this.existingResult.memberBasedScores.forEach((score) => {
           const itemGroup = memberBasedScoresGroup.get(
-            score.eventItemId.toString(),
+            score.eventItemId.toString()
           );
           if (itemGroup) {
             console.log(
-              `Asignando valores matchCount=${score.matchCount}, totalWithCharacteristic=${score.totalWithCharacteristic} al item ${score.eventItemId}`,
+              `Asignando valores matchCount=${score.matchCount}, totalWithCharacteristic=${score.totalWithCharacteristic} al item ${score.eventItemId}`
             );
             itemGroup.get('matchCount')?.setValue(score.matchCount);
 
@@ -402,7 +402,7 @@ export class EventScoringComponent implements OnInit {
             }
           } else {
             console.warn(
-              `No se encontró el grupo para el item basado en miembros ${score.eventItemId}`,
+              `No se encontró el grupo para el item basado en miembros ${score.eventItemId}`
             );
           }
         });
@@ -491,7 +491,7 @@ export class EventScoringComponent implements OnInit {
     } else if (eventType === 'MEMBER_BASED') {
       // Preparar scores basados en miembros
       const memberBasedScoresGroup = this.scoringForm.get(
-        'memberBasedScores',
+        'memberBasedScores'
       ) as FormGroup;
       const memberBasedScores: MemberBasedResultScore[] = [];
 
@@ -576,72 +576,38 @@ export class EventScoringComponent implements OnInit {
       const scores = this.scoringForm.get('scores')?.value;
       if (!scores) return 0;
 
-      let total = 0;
+      let regularTotal = 0;
       for (const [itemId, score] of Object.entries(scores)) {
         const item = this.event.items?.find((i) => i.id?.toString() === itemId);
         if (item) {
-          // Asegurarse de que el score sea un número válido
           const numericScore = Number(score);
           if (!isNaN(numericScore) && numericScore >= 0) {
-            // Para eventos regulares, simplemente sumamos el puntaje
-            total += numericScore;
+            regularTotal += numericScore;
           }
         }
       }
 
-      // Redondear el total a 2 decimales
-      total = Math.round(total * 100) / 100;
+      regularTotal = Math.round(regularTotal * 100) / 100;
 
-      // Validar que el total no exceda el puntaje máximo
-      const maxScore = this.event.maxScore || 100;
-      if (total > maxScore) {
-        this.errorMessage = `La puntuación total (${total.toFixed(
+      const eventMaxScore = this.event.maxScore || 100;
+      if (regularTotal > eventMaxScore) {
+        this.errorMessage = `La puntuación total (${regularTotal.toFixed(
           2
-        )}) no puede exceder el puntaje máximo del evento (${maxScore})`;
+        )}) no puede exceder el puntaje máximo del evento (${eventMaxScore})`;
       } else {
         this.errorMessage = '';
       }
 
-      this.totalScore = total;
+      this.totalScore = regularTotal;
       return this.totalScore;
     } else if (this.event.type === 'MEMBER_BASED') {
-      const memberBasedScores =
-        this.scoringForm.get('memberBasedScores')?.value;
-      if (!memberBasedScores) return 0;
+      const averagePercentage = this.getSumOfPercentages();
+      const eventMaxScore = this.event.maxScore || 100;
+      const memberBasedTotal = (averagePercentage * eventMaxScore) / 100;
 
-      let total = 0;
-      for (const [itemId, itemData] of Object.entries(memberBasedScores)) {
-        const item = this.event.memberBasedItems?.find(
-          (i) => i.id?.toString() === itemId
-        );
-        if (item) {
-          const data = itemData as {
-            matchCount: number;
-            totalWithCharacteristic: number;
-          };
-          if (data.totalWithCharacteristic > 0) {
-            const percentage =
-              (data.matchCount / data.totalWithCharacteristic) * 100;
-            const itemScore = (percentage * item.percentage) / 100;
-            total += itemScore;
-          }
-        }
-      }
+      this.totalScore = Math.round(memberBasedTotal * 100) / 100;
+      this.errorMessage = '';
 
-      // Redondear el total a 2 decimales
-      total = Math.round(total * 100) / 100;
-
-      // Validar que el total no exceda el puntaje máximo
-      const maxScore = this.event.maxScore || 100;
-      if (total > maxScore) {
-        this.errorMessage = `La puntuación total (${total.toFixed(
-          2
-        )}) no puede exceder el puntaje máximo del evento (${maxScore})`;
-      } else {
-        this.errorMessage = '';
-      }
-
-      this.totalScore = total;
       return this.totalScore;
     }
 
@@ -681,14 +647,14 @@ export class EventScoringComponent implements OnInit {
     }
 
     const memberBasedScoresGroup = this.scoringForm.get(
-      'memberBasedScores',
+      'memberBasedScores'
     ) as FormGroup;
     if (!memberBasedScoresGroup) {
       return 0;
     }
 
     const itemGroup = memberBasedScoresGroup.get(
-      itemId.toString(),
+      itemId.toString()
     ) as FormGroup;
     if (!itemGroup) {
       return 0;
@@ -704,6 +670,19 @@ export class EventScoringComponent implements OnInit {
 
     const percentage = (matchCount / totalWithChar) * 100;
     return Math.round(percentage);
+  }
+
+  getSumOfPercentages(): number {
+    if (!this.event || this.event.type !== 'MEMBER_BASED') return 0;
+
+    let sum = 0;
+    let count = 0;
+    for (const item of this.event.memberBasedItems || []) {
+      const percentage = this.getItemPercentage(item.id);
+      sum += percentage;
+      count++;
+    }
+    return count > 0 ? Math.round(sum / count) : 0;
   }
 
   // Método para cargar datos de un club específico
@@ -736,11 +715,11 @@ export class EventScoringComponent implements OnInit {
     }
 
     const memberBasedScoresGroup = this.scoringForm.get(
-      'memberBasedScores',
+      'memberBasedScores'
     ) as FormGroup;
     if (!memberBasedScoresGroup) {
       console.warn(
-        'No se encontró el grupo de memberBasedScores en el formulario',
+        'No se encontró el grupo de memberBasedScores en el formulario'
       );
       return;
     }
@@ -753,7 +732,7 @@ export class EventScoringComponent implements OnInit {
         item.applicableCharacteristics.length > 0
       ) {
         const itemGroup = memberBasedScoresGroup.get(
-          item.id.toString(),
+          item.id.toString()
         ) as FormGroup;
         if (!itemGroup) return;
 
@@ -769,15 +748,15 @@ export class EventScoringComponent implements OnInit {
             totalValue += charValue;
             characteristicsFound.push(characteristic);
             console.log(
-              `Característica ${characteristic} encontrada en club con valor: ${charValue}`,
+              `Característica ${characteristic} encontrada en club con valor: ${charValue}`
             );
           } else {
             console.warn(
-              `La característica ${characteristic} no se encontró en los datos del club`,
+              `La característica ${characteristic} no se encontró en los datos del club`
             );
           }
         });
-        
+
         // Actualizar el formulario con la suma de valores
         if (characteristicsFound.length > 0) {
           // Obtener el control y establecer el valor aunque esté deshabilitado
@@ -787,15 +766,17 @@ export class EventScoringComponent implements OnInit {
             // Asegurarse de que esté deshabilitado
             totalControl.disable({ emitEvent: false });
           }
-          
+
           // Si no hay un resultado existente, podemos establecer matchCount igual al total
           // como valor predeterminado (100% de cumplimiento)
           if (!this.existingResult) {
             itemGroup.get('matchCount')?.setValue(totalValue);
           }
-          
+
           console.log(
-            `Total de características (${characteristicsFound.join(', ')}): ${totalValue}`,
+            `Total de características (${characteristicsFound.join(
+              ', '
+            )}): ${totalValue}`
           );
         }
       }
