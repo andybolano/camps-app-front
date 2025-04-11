@@ -255,7 +255,15 @@
                           (input)="calculateTotalScore()"
                         />
                         <div class="invalid-feedback">
-                          Debe ser un número mayor o igual a 0.
+                          <div *ngIf="item.id && scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('matchCount')?.errors?.['required']">
+                            El número de miembros es requerido.
+                          </div>
+                          <div *ngIf="item.id && scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('matchCount')?.errors?.['min']">
+                            El número de miembros no puede ser menor a 0.
+                          </div>
+                          <div *ngIf="item.id && scoringForm.get('memberBasedScores')?.get(item.id.toString())?.get('matchCount')?.errors?.['exceedsTotal']">
+                            El número de miembros no puede exceder el total de miembros con la característica.
+                          </div>
                         </div>
                       </div>
 

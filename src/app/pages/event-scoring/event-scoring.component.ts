@@ -6,6 +6,7 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
 } from '@angular/forms';
 import { EventService, Event } from '../../services/event.service';
 import {
@@ -134,14 +135,17 @@ export class EventScoringComponent implements OnInit {
   }
 
   private loadClubs(): Promise<void> {
+    this.isLoading = true;
     return new Promise<void>((resolve) => {
       this.clubService.getClubsByCamp(this.campId).subscribe({
         next: (clubs) => {
           this.clubs = clubs;
+          this.isLoading = false;
           resolve();
         },
         error: (error) => {
           this.errorMessage = `Error al cargar los clubes: ${error.message}`;
+          this.isLoading = false;
           resolve();
         },
       });
@@ -231,7 +235,23 @@ export class EventScoringComponent implements OnInit {
 
       // Crear un grupo para cada item con controles para matchCount y totalWithCharacteristic
       const itemGroup = this.fb.group({
-        matchCount: [0, [Validators.required, Validators.min(0)]],
+        matchCount: [
+          0,
+          [
+            Validators.required,
+            Validators.min(0),
+            (control: AbstractControl) => {
+              const totalControl = control.parent?.get(
+                'totalWithCharacteristic'
+              );
+              const totalValue = totalControl?.value || 0;
+              if (control.value > totalValue) {
+                return { exceedsTotal: true };
+              }
+              return null;
+            },
+          ],
+        ],
         totalWithCharacteristic: [
           { value: 0, disabled: true },
           [Validators.required, Validators.min(0)],
@@ -281,6 +301,7 @@ export class EventScoringComponent implements OnInit {
       console.warn(
         'No se pueden verificar resultados sin eventId y clubId válidos'
       );
+      this.isLoading = false;
       return;
     }
 
@@ -687,7 +708,10 @@ export class EventScoringComponent implements OnInit {
 
   // Método para cargar datos de un club específico
   private loadClubData(clubId: number): void {
-    if (!clubId) return;
+    if (!clubId) {
+      this.isLoading = false;
+      return;
+    }
 
     this.isLoading = true;
     this.clubService.getClub(clubId).subscribe({
