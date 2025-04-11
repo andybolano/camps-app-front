@@ -590,14 +590,7 @@ export class EventScoringComponent implements OnInit {
             const control = scoresGroup.get(item.id.toString());
             if (control) {
               const score = parseFloat(control.value) || 0;
-              const percentage = item.percentage || 0;
-              const weightedScore = (score * percentage) / 100;
-
-              console.log(
-                `Item ${item.id} (${item.name}): Score=${score}, Peso=${percentage}%, Ponderado=${weightedScore}`,
-              );
-
-              total += weightedScore;
+              total += score;
             }
           }
         }
@@ -639,14 +632,7 @@ export class EventScoringComponent implements OnInit {
 
               // Escala a 0-10
               const score = proportion * 10;
-              const percentage = item.percentage || 0;
-              const weightedScore = (score * percentage) / 100;
-
-              console.log(
-                `Item ${item.id} (${item.name}): MatchCount=${matchCount}, Total=${totalWithChar}, Proporción=${proportion}, Score=${score}, Peso=${percentage}%, Ponderado=${weightedScore}`,
-              );
-
-              total += weightedScore;
+              total += score;
             }
           }
         }

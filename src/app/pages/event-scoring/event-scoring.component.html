@@ -99,14 +99,12 @@
                   <thead>
                     <tr>
                       <th>Ítem de Calificación</th>
-                      <th style="width: 150px">Porcentaje</th>
-                      <th style="width: 250px">Calificación (0-10)</th>
+                      <th style="width: 250px">Calificación</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of event?.items">
                       <td>{{ item.name }}</td>
-                      <td>{{ item.percentage }}%</td>
                       <td>
                         <input
                           type="number"
@@ -143,7 +141,6 @@
                   <tfoot>
                     <tr class="table-primary fw-bold">
                       <td>Puntuación Total</td>
-                      <td>100%</td>
                       <td>{{ totalScore }}</td>
                     </tr>
                   </tfoot>

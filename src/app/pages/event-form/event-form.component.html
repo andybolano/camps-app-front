@@ -99,7 +99,7 @@
                 [formGroupName]="i"
                 class="row mb-3 align-items-end border-bottom pb-3"
               >
-                <div class="col-md-5">
+                <div class="col-md-10">
                   <label [for]="'itemName' + i" class="form-label"
                     >Nombre del Ítem*</label
                   >
@@ -119,33 +119,6 @@
                     "
                   >
                     El nombre del ítem es obligatorio.
-                  </div>
-                </div>
-
-                <div class="col-md-5">
-                  <label [for]="'itemPoints' + i" class="form-label"
-                    >Porcentaje (%)*</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    [id]="'itemPoints' + i"
-                    formControlName="percentage"
-                    min="0"
-                    max="100"
-                    [class.is-invalid]="
-                      item.get('percentage')?.invalid &&
-                      item.get('percentage')?.touched
-                    "
-                  />
-                  <div
-                    class="invalid-feedback"
-                    *ngIf="
-                      item.get('percentage')?.invalid &&
-                      item.get('percentage')?.touched
-                    "
-                  >
-                    El porcentaje debe ser un número entre 0 y 100.
                   </div>
                 </div>
 
@@ -211,33 +184,6 @@
                 </div>
 
                 <div class="col-md-6">
-                  <label [for]="'mbItemPoints' + i" class="form-label"
-                    >Porcentaje (%)*</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    [id]="'mbItemPoints' + i"
-                    formControlName="percentage"
-                    min="0"
-                    max="100"
-                    [class.is-invalid]="
-                      item.get('percentage')?.invalid &&
-                      item.get('percentage')?.touched
-                    "
-                  />
-                  <div
-                    class="invalid-feedback"
-                    *ngIf="
-                      item.get('percentage')?.invalid &&
-                      item.get('percentage')?.touched
-                    "
-                  >
-                    El porcentaje debe ser un número entre 0 y 100.
-                  </div>
-                </div>
-
-                <div class="col-md-12 mt-2">
                   <label [for]="'mbItemChar' + i" class="form-label"
                     >Características Aplicables*</label
                   >
@@ -248,16 +194,19 @@
                         type="checkbox"
                         [id]="'mbItemChar' + i + char.value"
                         [value]="char.value"
-                        (change)="onCharacteristicChange($event, i, char.value)"
                         [checked]="isCharacteristicSelected(i, char.value)"
+                        (change)="onCharacteristicChange($event, i, char.value)"
                       />
-                      <label class="form-check-label" [for]="'mbItemChar' + i + char.value">
+                      <label
+                        class="form-check-label"
+                        [for]="'mbItemChar' + i + char.value"
+                      >
                         {{ char.label }}
                       </label>
                     </div>
                   </div>
                   <div
-                    class="text-danger small mt-1"
+                    class="invalid-feedback"
                     *ngIf="
                       item.get('applicableCharacteristics')?.invalid &&
                       item.get('applicableCharacteristics')?.touched

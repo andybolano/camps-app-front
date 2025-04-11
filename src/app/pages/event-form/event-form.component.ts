@@ -43,7 +43,7 @@ export class EventFormComponent implements OnInit {
     private eventService: EventService,
     private campService: CampService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +113,7 @@ export class EventFormComponent implements OnInit {
 
           // Añadir cada item
           event.items.forEach((item) => {
-            this.addItem(item.name, item.percentage);
+            this.addItem(item.name);
           });
         }
 
@@ -124,11 +124,7 @@ export class EventFormComponent implements OnInit {
 
           // Añadir cada item
           event.memberBasedItems.forEach((item) => {
-            this.addMemberBasedItem(
-              item.name,
-              item.percentage,
-              item.applicableCharacteristics,
-            );
+            this.addMemberBasedItem(item.name, item.applicableCharacteristics);
           });
         }
 
@@ -153,13 +149,9 @@ export class EventFormComponent implements OnInit {
     return this.eventForm.get('type')?.value;
   }
 
-  addItem(name: string = '', percentage: number = 0): void {
+  addItem(name: string = ''): void {
     const itemForm = this.fb.group({
       name: [name, Validators.required],
-      percentage: [
-        percentage,
-        [Validators.required, Validators.min(0), Validators.max(100)],
-      ],
     });
 
     this.items.push(itemForm);
@@ -167,15 +159,10 @@ export class EventFormComponent implements OnInit {
 
   addMemberBasedItem(
     name: string = '',
-    percentage: number = 0,
-    applicableCharacteristics: string[] = [],
+    applicableCharacteristics: string[] = []
   ): void {
     const itemForm = this.fb.group({
       name: [name, Validators.required],
-      percentage: [
-        percentage,
-        [Validators.required, Validators.min(0), Validators.max(100)],
-      ],
       applicableCharacteristics: [
         applicableCharacteristics,
         [Validators.required, Validators.minLength(1)],
@@ -346,7 +333,7 @@ export class EventFormComponent implements OnInit {
   private getMultiBranchItemAt(index: number): FormGroup | null {
     return (this.eventForm?.get('memberBasedItems') as FormArray | null)
       ? ((this.eventForm.get('memberBasedItems') as FormArray).at(
-          index,
+          index
         ) as FormGroup)
       : null;
   }
