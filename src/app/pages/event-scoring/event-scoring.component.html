@@ -115,7 +115,6 @@
                             item.id !== undefined ? item.id.toString() : ''
                           "
                           min="0"
-                          max="10"
                           step="0.1"
                           [class.is-invalid]="
                             item.id !== undefined &&
@@ -136,7 +135,7 @@
                               ?.touched
                           "
                         >
-                          La calificación debe ser entre 0 y 10.
+                          La calificación debe ser mayor o igual a 0.
                         </div>
                       </td>
                     </tr>
@@ -145,7 +144,7 @@
                     <tr class="table-primary fw-bold">
                       <td>Puntuación Total</td>
                       <td>100%</td>
-                      <td>{{ totalScore | number: '1.1-1' }}</td>
+                      <td>{{ totalScore }}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -278,7 +277,7 @@
                     <div class="card bg-light">
                       <div class="card-body">
                         <h5 class="card-title">Puntuación Total</h5>
-                        <h2 class="display-6 text-primary">{{ totalScore | number: '1.1-1' }}</h2>
+                        <h2 class="display-6 text-primary">{{ totalScore }}</h2>
                       </div>
                     </div>
                   </div>
@@ -352,7 +351,7 @@
                   <tr>
                     <th class="text-center" style="width: 50px">Pos.</th>
                     <th>Club</th>
-                    <th class="text-center" style="width: 80px">Puntos</th>
+                    <th class="text-right" style="width: 80px">Puntos</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -369,7 +368,7 @@
                       </span>
                     </td>
                     <td>{{ result.club?.name || 'Sin nombre' }}</td>
-                    <td class="text-center fw-bold">{{ result.totalScore | number: '1.1-1' }}</td>
+                    <td class="text-right fw-bold">{{ result.totalScore }}</td>
                   </tr>
                 </tbody>
               </table>

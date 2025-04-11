@@ -184,11 +184,7 @@ export class EventScoringComponent implements OnInit {
       );
       scoresGroup.addControl(
         item.id!.toString(),
-        this.fb.control(0, [
-          Validators.required,
-          Validators.min(0),
-          Validators.max(10),
-        ]),
+        this.fb.control(0, [Validators.required, Validators.min(0)])
       );
     });
 
