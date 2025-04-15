@@ -19,22 +19,34 @@ export interface Result {
   id?: number;
   eventId: number;
   clubId: number;
-  scores?: ResultScore[];
-  items?: ResultScore[]; // Para compatibilidad con el backend
-  memberBasedScores?: MemberBasedResultScore[];
-  memberBasedItems?: MemberBasedResultScore[]; // Para compatibilidad con el backend
-  totalScore?: number;
-  rank?: number; // Posición en el ranking
-  club?: {
-    id: number;
-    name: string;
-  };
   event?: {
     id: number;
     name: string;
     date?: string;
     description?: string;
     type?: 'REGULAR' | 'MEMBER_BASED';
+  };
+  totalScore?: number;
+  rank?: number;
+  club?: {
+    id: number;
+    name: string;
+  };
+  scores?: ResultScore[];
+  items?: ResultScore[];
+  memberBasedScores?: MemberBasedResultScore[];
+  memberBasedItems?: MemberBasedResultScore[];
+  resultDetail?: {
+    eventName: string;
+    eventDate?: string;
+    totalScore: number;
+    rank?: number;
+    items: {
+      name: string;
+      percentage: number;
+      score: number;
+      weightedScore: number;
+    }[];
   };
 }
 

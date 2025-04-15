@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-4 d-print-none">
   <!-- Cabecera con información del club -->
   <div class="row mb-4">
     <div class="col-md-12">
@@ -119,8 +119,8 @@
           </div>
           
           <div *ngIf="results.length > 0">
-            <div class="mb-3">
-              <div class="input-group">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="input-group" style="width: 300px;">
                 <span class="input-group-text">
                   <i class="bi bi-search"></i>
                 </span>
@@ -130,6 +130,9 @@
                        (ngModelChange)="filterResults()"
                        placeholder="Buscar por nombre de evento...">
               </div>
+              <button class="btn btn-outline-primary" (click)="printResults()">
+                <i class="bi bi-printer"></i> Imprimir Resultados
+              </button>
             </div>
             <table class="table table-striped">
               <thead>
@@ -157,7 +160,7 @@
                     <span *ngIf="!result.rank">-</span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-info" (click)="showResultDetail(result)">
+                    <button class="btn btn-sm btn-secondary" (click)="showResultDetail(result)">
                       <i class="bi bi-eye"></i> Ver Detalle
                     </button>
                   </td>
@@ -172,12 +175,12 @@
 </div>
 
 <!-- Modal de Detalles del Resultado -->
-<div class="modal fade" #resultModal tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+<div class="modal fade d-print-none" #resultModal tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="resultModalLabel">
-          Detalles de Puntuación: {{ resultDetail?.eventName }}
+          Detalles de Puntuación: {{ resultDetail.eventName }}
         </h5>
         <button type="button" class="btn-close btn-close-white btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -242,4 +245,42 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Tabla para impresión -->
+<div class="d-none d-print-block">
+  <div class="text-center mb-3">
+    <h4>{{ club?.name }}</h4>
+    <h5>Resultados en Eventos</h5>
+  </div>
+  <table class="table table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Evento</th>
+        <th>Puntuación Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let result of results">
+        <tr>
+          <td style="font-size: 12px; font-weight: bold; background-color: #f2f2f2;">{{ result.event?.name || 'Evento desconocido' }}</td>
+          <td class="text-end" style="font-size: 12px; font-weight: bold; background-color: #f2f2f2;">{{ result.totalScore | number:'1.2-2' }}</td>
+        </tr>
+        <ng-container *ngIf="result.resultDetail as detail">
+          <ng-container *ngIf="detail.items as items">
+            <tr *ngIf="items.length > 0">
+              <td colspan="3" class="p-0">
+                <table class="table table-sm mb-0">
+                  <tr *ngFor="let item of items">
+                    <td class="border-0 p-1" style="font-size: 10px;">{{ item.name }}</td>
+                    <td class="border-0 p-1 text-end" style="font-size: 10px;">{{ item.score | number:'1.2-2' }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </tbody>
+  </table>
 </div> 

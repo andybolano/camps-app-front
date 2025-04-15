@@ -6,6 +6,7 @@ import { Result, ResultService } from '../../services/result.service';
 import { CampService } from '../../services/camp.service';
 import { EventService } from '../../services/event.service';
 import { FormsModule } from '@angular/forms';
+import { ResultScore } from '../../types/result.types';
 
 declare const bootstrap: any; // Declaración para usar Bootstrap JS
 
@@ -43,7 +44,11 @@ export class ClubDetailComponent implements OnInit {
       score: number;
       weightedScore: number;
     }[];
-  } | null = null;
+  } = {
+    eventName: '',
+    totalScore: 0,
+    items: [],
+  };
 
   modal: any;
 
@@ -277,6 +282,7 @@ export class ClubDetailComponent implements OnInit {
         let score = 0;
         let matchCount = 0;
         let totalWithCharacteristic = 0;
+        let resultScore: any = null;
 
         // Buscar la puntuación correspondiente
         if (hasNestedEventItem) {
@@ -288,6 +294,7 @@ export class ClubDetailComponent implements OnInit {
             score = matchingItem.score || 0;
             matchCount = matchingItem.matchCount || 0;
             totalWithCharacteristic = matchingItem.totalWithCharacteristic || 0;
+            resultScore = matchingItem;
           }
         } else {
           // Formato plano: item.eventItemId
@@ -298,6 +305,7 @@ export class ClubDetailComponent implements OnInit {
             score = matchingItem.score || 0;
             matchCount = matchingItem.matchCount || 0;
             totalWithCharacteristic = matchingItem.totalWithCharacteristic || 0;
+            resultScore = matchingItem;
           }
         }
 
@@ -309,6 +317,12 @@ export class ClubDetailComponent implements OnInit {
           totalWithCharacteristic > 0
             ? ` (${matchCount}/${totalWithCharacteristic})`
             : '';
+
+        // Asignar el nombre al ResultScore si existe
+        if (resultScore) {
+          resultScore.name =
+            (eventItem.name || `Ítem ${eventItem.id}`) + matchInfo;
+        }
 
         return {
           name: (eventItem.name || `Ítem ${eventItem.id}`) + matchInfo,
@@ -346,6 +360,7 @@ export class ClubDetailComponent implements OnInit {
       // Mapear los items del evento
       this.resultDetail.items = event.items.map((eventItem: any) => {
         let score = 0;
+        let resultScore: ResultScore | null = null;
 
         // Buscar la puntuación correspondiente
         if (hasNestedEventItem) {
@@ -353,13 +368,43 @@ export class ClubDetailComponent implements OnInit {
           const matchingItem = resultItems.find(
             (item) => item.eventItem && item.eventItem.id === eventItem.id
           );
-          if (matchingItem) score = matchingItem.score || 0;
+          if (matchingItem) {
+            score = matchingItem.score || 0;
+            resultScore = {
+              id: matchingItem.id || 0,
+              resultId: matchingItem.resultId || 0,
+              eventItemId: matchingItem.eventItemId || 0,
+              score: matchingItem.score || 0,
+              matchCount: matchingItem.matchCount || 0,
+              totalCharacteristics: matchingItem.totalCharacteristics || 0,
+              name: eventItem.name || `Ítem ${eventItem.id}`,
+              eventItem: {
+                id: eventItem.id,
+                name: eventItem.name || `Ítem ${eventItem.id}`,
+              },
+            };
+          }
         } else {
           // Formato plano: item.eventItemId
           const matchingItem = resultItems.find(
             (item) => item.eventItemId === eventItem.id
           );
-          if (matchingItem) score = matchingItem.score || 0;
+          if (matchingItem) {
+            score = matchingItem.score || 0;
+            resultScore = {
+              id: matchingItem.id || 0,
+              resultId: matchingItem.resultId || 0,
+              eventItemId: matchingItem.eventItemId || 0,
+              score: matchingItem.score || 0,
+              matchCount: matchingItem.matchCount || 0,
+              totalCharacteristics: matchingItem.totalCharacteristics || 0,
+              name: eventItem.name || `Ítem ${eventItem.id}`,
+              eventItem: {
+                id: eventItem.id,
+                name: eventItem.name || `Ítem ${eventItem.id}`,
+              },
+            };
+          }
         }
 
         const percentage = eventItem.percentage || 0;
@@ -389,5 +434,116 @@ export class ClubDetailComponent implements OnInit {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  }
+
+  printResults(): void {
+    // Crear una copia de los resultados para procesar
+    const resultsToPrint = [...this.results];
+    let processedResults = 0;
+
+    // Procesar cada resultado
+    resultsToPrint.forEach((result) => {
+      const eventId = result.eventId || result.event?.id;
+      if (eventId) {
+        this.eventService.getEvent(eventId).subscribe({
+          next: (event) => {
+            // Crear un nuevo resultDetail para este resultado
+            const currentResultDetail: {
+              eventName: string;
+              eventDate?: string;
+              totalScore: number;
+              rank?: number;
+              items: {
+                name: string;
+                percentage: number;
+                score: number;
+                weightedScore: number;
+              }[];
+            } = {
+              eventName: result.event?.name || 'Evento desconocido',
+              eventDate: result.event?.date,
+              totalScore: result.totalScore || 0,
+              rank: result.rank,
+              items: [],
+            };
+
+            // Procesar los items
+            if (event.type === 'MEMBER_BASED' && event.memberBasedItems) {
+              currentResultDetail.items = event.memberBasedItems.map(
+                (eventItem: any) => {
+                  const matchingItem =
+                    result.memberBasedItems?.find(
+                      (item) => item.eventItemId === eventItem.id
+                    ) ||
+                    result.memberBasedScores?.find(
+                      (item) => item.eventItemId === eventItem.id
+                    );
+
+                  const score = matchingItem
+                    ? (matchingItem as any).score || 0
+                    : 0;
+                  const percentage = eventItem.percentage || 0;
+
+                  return {
+                    name: eventItem.name || `Ítem ${eventItem.id}`,
+                    percentage: percentage,
+                    score: score,
+                    weightedScore: (score * percentage) / 100,
+                  };
+                }
+              );
+            } else if (event.items) {
+              currentResultDetail.items = event.items.map((eventItem: any) => {
+                const matchingItem =
+                  result.items?.find(
+                    (item) => item.eventItemId === eventItem.id
+                  ) ||
+                  result.scores?.find(
+                    (item) => item.eventItemId === eventItem.id
+                  );
+
+                const score = matchingItem
+                  ? (matchingItem as any).score || 0
+                  : 0;
+                const percentage = eventItem.percentage || 0;
+
+                return {
+                  name: eventItem.name || `Ítem ${eventItem.id}`,
+                  percentage: percentage,
+                  score: score,
+                  weightedScore: (score * percentage) / 100,
+                };
+              });
+            }
+
+            // Asignar el resultDetail procesado al resultado
+            (result as any).resultDetail = currentResultDetail;
+            processedResults++;
+
+            // Si todos los resultados han sido procesados, imprimir
+            if (processedResults === resultsToPrint.length) {
+              setTimeout(() => {
+                window.print();
+              }, 100);
+            }
+          },
+          error: () => {
+            processedResults++;
+            if (processedResults === resultsToPrint.length) {
+              setTimeout(() => {
+                window.print();
+              }, 100);
+            }
+          },
+        });
+      } else {
+        processedResults++;
+        if (processedResults === resultsToPrint.length) {
+          setTimeout(() => {
+            window.print();
+          }, 100);
+        }
+      }
+    });
   }
 }

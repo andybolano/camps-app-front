@@ -51,4 +51,94 @@
       font-size: 1.1rem;
     }
   }
+}
+
+// Estilos para impresión
+@media print {
+  @page {
+    margin: 0;
+    size: A4;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  .d-print-block,
+  .d-print-block * {
+    visibility: visible;
+  }
+  
+  .d-print-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2cm;
+  }
+
+  // Estilos para la tabla de impresión
+  .d-print-block {
+    h4 {
+      font-size: 24px;
+      margin-bottom: 1rem;
+      color: #000;
+    }
+    
+    h5 {
+      font-size: 18px;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      
+      th {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        font-weight: bold;
+        text-align: left;
+      }
+      
+      td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+      }
+      
+      .text-end {
+        text-align: right;
+      }
+      
+      .text-center {
+        text-align: center;
+      }
+    }
+    
+    .table-sm {
+      th, td {
+        padding: 0.3rem;
+      }
+    }
+  }
+
+  // Ocultar elementos del navegador
+  ::ng-deep {
+    .navbar,
+    .breadcrumb,
+    .page-header,
+    .page-footer,
+    .page-title,
+    .page-url,
+    header,
+    footer,
+    .header,
+    .footer {
+      display: none !important;
+    }
+  }
 } 
