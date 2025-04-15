@@ -5,13 +5,14 @@ import { Club, ClubService } from '../../services/club.service';
 import { Result, ResultService } from '../../services/result.service';
 import { CampService } from '../../services/camp.service';
 import { EventService } from '../../services/event.service';
+import { FormsModule } from '@angular/forms';
 
 declare const bootstrap: any; // Declaración para usar Bootstrap JS
 
 @Component({
   selector: 'app-club-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe, DecimalPipe],
+  imports: [CommonModule, RouterLink, CurrencyPipe, DecimalPipe, FormsModule],
   templateUrl: './club-detail.component.html',
   styleUrl: './club-detail.component.scss',
 })
@@ -22,8 +23,12 @@ export class ClubDetailComponent implements OnInit {
   campId!: number;
   club: Club | null = null;
   results: Result[] = [];
+  filteredResults: Result[] = [];
   isLoading = true;
   errorMessage = '';
+  searchTerm = '';
+  sortColumn = 'event.name';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   // Propiedades para el modal
   currentResult: Result | null = null;
@@ -47,7 +52,7 @@ export class ClubDetailComponent implements OnInit {
     private resultService: ResultService,
     private campService: CampService,
     private eventService: EventService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -87,11 +92,54 @@ export class ClubDetailComponent implements OnInit {
     this.resultService.getResultsByClub(this.clubId).subscribe({
       next: (results) => {
         this.results = results;
+        this.filteredResults = [...results];
+        this.sortResults();
         console.log('Resultados obtenidos:', results);
       },
       error: (error) => {
         this.errorMessage = `Error al cargar resultados: ${error.message}`;
       },
+    });
+  }
+
+  filterResults(): void {
+    if (!this.searchTerm) {
+      this.filteredResults = [...this.results];
+    } else {
+      const searchLower = this.searchTerm.toLowerCase();
+      this.filteredResults = this.results.filter((result) =>
+        (result.event?.name || 'Evento desconocido')
+          .toLowerCase()
+          .includes(searchLower)
+      );
+    }
+    this.sortResults();
+  }
+
+  sortBy(column: string): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.sortResults();
+  }
+
+  sortResults(): void {
+    this.filteredResults.sort((a, b) => {
+      const aValue =
+        this.sortColumn === 'event.name'
+          ? (a.event?.name || 'Evento desconocido').toLowerCase()
+          : (a[this.sortColumn as keyof Result] || '').toString().toLowerCase();
+      const bValue =
+        this.sortColumn === 'event.name'
+          ? (b.event?.name || 'Evento desconocido').toLowerCase()
+          : (b[this.sortColumn as keyof Result] || '').toString().toLowerCase();
+
+      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -115,7 +163,7 @@ export class ClubDetailComponent implements OnInit {
     if (!eventId) {
       console.error(
         'No se pudo determinar el ID del evento para este resultado:',
-        result,
+        result
       );
       this.resultDetail.items = [];
       this.openModal();
@@ -173,7 +221,7 @@ export class ClubDetailComponent implements OnInit {
     ) {
       console.warn(
         'El evento no tiene items ni memberBasedItems definidos o no son arrays:',
-        event,
+        event
       );
       this.resultDetail.items = [];
       return;
@@ -187,7 +235,7 @@ export class ClubDetailComponent implements OnInit {
     ) {
       console.log(
         'Evento de tipo MEMBER_BASED. Procesando memberBasedItems:',
-        event.memberBasedItems,
+        event.memberBasedItems
       );
 
       // Extraer los scores del resultado para eventos basados en miembros
@@ -197,7 +245,7 @@ export class ClubDetailComponent implements OnInit {
       if (result.memberBasedItems && Array.isArray(result.memberBasedItems)) {
         console.log(
           'Usando memberBasedItems del resultado:',
-          result.memberBasedItems,
+          result.memberBasedItems
         );
         memberBasedResultItems = result.memberBasedItems;
       }
@@ -208,7 +256,7 @@ export class ClubDetailComponent implements OnInit {
       ) {
         console.log(
           'Usando memberBasedScores del resultado:',
-          result.memberBasedScores,
+          result.memberBasedScores
         );
         memberBasedResultItems = result.memberBasedScores;
       }
@@ -221,7 +269,7 @@ export class ClubDetailComponent implements OnInit {
 
       console.log(
         'MemberBasedItems tienen estructura anidada:',
-        hasNestedEventItem,
+        hasNestedEventItem
       );
 
       // Mapear los items del evento basado en miembros
@@ -234,7 +282,7 @@ export class ClubDetailComponent implements OnInit {
         if (hasNestedEventItem) {
           // Formato anidado: item.eventItem.id
           const matchingItem = memberBasedResultItems.find(
-            (item) => item.eventItem && item.eventItem.id === eventItem.id,
+            (item) => item.eventItem && item.eventItem.id === eventItem.id
           );
           if (matchingItem) {
             score = matchingItem.score || 0;
@@ -244,7 +292,7 @@ export class ClubDetailComponent implements OnInit {
         } else {
           // Formato plano: item.eventItemId
           const matchingItem = memberBasedResultItems.find(
-            (item) => item.eventItemId === eventItem.id,
+            (item) => item.eventItemId === eventItem.id
           );
           if (matchingItem) {
             score = matchingItem.score || 0;
@@ -303,13 +351,13 @@ export class ClubDetailComponent implements OnInit {
         if (hasNestedEventItem) {
           // Formato anidado: item.eventItem.id
           const matchingItem = resultItems.find(
-            (item) => item.eventItem && item.eventItem.id === eventItem.id,
+            (item) => item.eventItem && item.eventItem.id === eventItem.id
           );
           if (matchingItem) score = matchingItem.score || 0;
         } else {
           // Formato plano: item.eventItemId
           const matchingItem = resultItems.find(
-            (item) => item.eventItemId === eventItem.id,
+            (item) => item.eventItemId === eventItem.id
           );
           if (matchingItem) score = matchingItem.score || 0;
         }

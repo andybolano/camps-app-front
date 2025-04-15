@@ -1,6 +1,246 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 @import '@ng-select/ng-select/scss/default.theme.scss';
 
-html, body { height: 100%; }
+:root {
+    --primary-color: #1c1c27;
+    --text-color: #1c1c27;
+    --white: #ffffff;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --gray-900: #212529;
+    --border-radius: 0;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+html, body { 
+    height: 100%;
+    font-family: 'Onest', sans-serif;
+    color: var(--primary-color);
+    background-color: var(--gray-100);
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: var(--white) !important;
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--white) !important;
+    }
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+* {
+    font-family: 'Onest', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Modern Card Styles */
+.card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: none;
+    transition: var(--transition);
+    background-color: var(--white);
+}
+
+.card-header:first-child {
+    border-radius: var(--border-radius);
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Modern Button Styles */
+button, 
+.btn, 
+[type="button"], 
+[type="submit"] {
+    background-color: var(--primary-color) !important;
+    color: var(--white) !important;
+    border-color: var(--primary-color) !important;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+button:hover, 
+.btn:hover, 
+[type="button"]:hover, 
+[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--box-shadow);
+}
+
+/* Secondary button styles */
+.btn-secondary {
+    background-color: transparent !important;
+    color: var(--primary-color) !important;
+    border-color: transparent !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--gray-100) !important;
+}
+
+/* Form Elements */
+input, 
+textarea, 
+select {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-300);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(28, 28, 39, 0.25);
+    outline: none;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    background-color: var(--gray-100);
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+tr:hover {
+    background-color: var(--gray-100);
+}
+
+/* Badge Styles */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+/* Icon styles within buttons */
+button i,
+.btn i,
+[type="button"] i,
+[type="submit"] i,
+button .bi,
+.btn .bi,
+[type="button"] .bi,
+[type="submit"] .bi,
+button mat-icon,
+.btn mat-icon,
+[type="button"] mat-icon,
+[type="submit"] mat-icon {
+    color: var(--white) !important;
+}
+
+/* Secondary button icon styles */
+.btn-secondary i,
+.btn-secondary .bi,
+.btn-secondary mat-icon {
+    color: var(--primary-color) !important;
+}
+
+/* Override ng-select styles */
+.ng-select {
+    border-radius: var(--border-radius);
+}
+
+.ng-select .ng-select-container {
+    color: var(--primary-color) !important;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-300);
+}
+
+.ng-select.ng-select-focused .ng-select-container {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(28, 28, 39, 0.25);
+}
+
+/* Typography */
+h1, h2, h3, h4, h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Material Design Overrides */
+.mat-button, 
+.mat-raised-button, 
+.mat-stroked-button, 
+.mat-flat-button {
+    background-color: var(--primary-color) !important;
+    color: var(--white) !important;
+    border-color: var(--primary-color) !important;
+    border-radius: var(--border-radius) !important;
+}
+
+.mat-button:hover, 
+.mat-raised-button:hover, 
+.mat-stroked-button:hover, 
+.mat-flat-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--box-shadow);
+}
+
+/* Utility Classes */
+.text-white {
+    color: var(--white) !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--box-shadow);
+}
+
+.rounded {
+    border-radius: var(--border-radius);
+}
+
+.transition {
+    transition: var(--transition);
+}
+
+.btn-group {
+    gap: 4px;
+}
