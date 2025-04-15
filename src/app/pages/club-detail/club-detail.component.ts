@@ -7,13 +7,21 @@ import { CampService } from '../../services/camp.service';
 import { EventService } from '../../services/event.service';
 import { FormsModule } from '@angular/forms';
 import { ResultScore } from '../../types/result.types';
+import { OrderByPipe } from '../../pipes/order-by.pipe';
 
 declare const bootstrap: any; // Declaración para usar Bootstrap JS
 
 @Component({
   selector: 'app-club-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe, DecimalPipe, FormsModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    CurrencyPipe,
+    DecimalPipe,
+    FormsModule,
+    OrderByPipe,
+  ],
   templateUrl: './club-detail.component.html',
   styleUrl: './club-detail.component.scss',
 })
@@ -436,13 +444,17 @@ export class ClubDetailComponent implements OnInit {
     return date.toLocaleDateString();
   }
 
-  printResults(): void {
-    // Crear una copia de los resultados para procesar
-    const resultsToPrint = [...this.results];
-    let processedResults = 0;
+  printResults() {
+    // Ordenar los resultados alfabéticamente por nombre del evento
+    const sortedResults = [...this.results].sort((a, b) => {
+      const nameA = a.event?.name?.toLowerCase() || '';
+      const nameB = b.event?.name?.toLowerCase() || '';
+      return nameA.localeCompare(nameB, 'es', { sensitivity: 'base' });
+    });
 
     // Procesar cada resultado
-    resultsToPrint.forEach((result) => {
+    let processedResults = 0;
+    sortedResults.forEach((result) => {
       const eventId = result.eventId || result.event?.id;
       if (eventId) {
         this.eventService.getEvent(eventId).subscribe({
@@ -468,32 +480,31 @@ export class ClubDetailComponent implements OnInit {
             };
 
             // Procesar los items
+            let items: any[] = [];
             if (event.type === 'MEMBER_BASED' && event.memberBasedItems) {
-              currentResultDetail.items = event.memberBasedItems.map(
-                (eventItem: any) => {
-                  const matchingItem =
-                    result.memberBasedItems?.find(
-                      (item) => item.eventItemId === eventItem.id
-                    ) ||
-                    result.memberBasedScores?.find(
-                      (item) => item.eventItemId === eventItem.id
-                    );
+              items = event.memberBasedItems.map((eventItem: any) => {
+                const matchingItem =
+                  result.memberBasedItems?.find(
+                    (item) => item.eventItemId === eventItem.id
+                  ) ||
+                  result.memberBasedScores?.find(
+                    (item) => item.eventItemId === eventItem.id
+                  );
 
-                  const score = matchingItem
-                    ? (matchingItem as any).score || 0
-                    : 0;
-                  const percentage = eventItem.percentage || 0;
+                const score = matchingItem
+                  ? (matchingItem as any).score || 0
+                  : 0;
+                const percentage = eventItem.percentage || 0;
 
-                  return {
-                    name: eventItem.name || `Ítem ${eventItem.id}`,
-                    percentage: percentage,
-                    score: score,
-                    weightedScore: (score * percentage) / 100,
-                  };
-                }
-              );
+                return {
+                  name: eventItem.name || `Ítem ${eventItem.id}`,
+                  percentage: percentage,
+                  score: score,
+                  weightedScore: (score * percentage) / 100,
+                };
+              });
             } else if (event.items) {
-              currentResultDetail.items = event.items.map((eventItem: any) => {
+              items = event.items.map((eventItem: any) => {
                 const matchingItem =
                   result.items?.find(
                     (item) => item.eventItemId === eventItem.id
@@ -516,12 +527,23 @@ export class ClubDetailComponent implements OnInit {
               });
             }
 
+            // Ordenar los items alfabéticamente por nombre
+            items.sort((a, b) => {
+              const nameA = a.name.toLowerCase();
+              const nameB = b.name.toLowerCase();
+              return nameA.localeCompare(nameB, 'es', { sensitivity: 'base' });
+            });
+
+            // Asignar los items ordenados
+            currentResultDetail.items = items;
+
             // Asignar el resultDetail procesado al resultado
             (result as any).resultDetail = currentResultDetail;
             processedResults++;
 
-            // Si todos los resultados han sido procesados, imprimir
-            if (processedResults === resultsToPrint.length) {
+            // Si todos los resultados han sido procesados, actualizar y imprimir
+            if (processedResults === sortedResults.length) {
+              this.results = sortedResults;
               setTimeout(() => {
                 window.print();
               }, 100);
@@ -529,7 +551,8 @@ export class ClubDetailComponent implements OnInit {
           },
           error: () => {
             processedResults++;
-            if (processedResults === resultsToPrint.length) {
+            if (processedResults === sortedResults.length) {
+              this.results = sortedResults;
               setTimeout(() => {
                 window.print();
               }, 100);
@@ -538,7 +561,8 @@ export class ClubDetailComponent implements OnInit {
         });
       } else {
         processedResults++;
-        if (processedResults === resultsToPrint.length) {
+        if (processedResults === sortedResults.length) {
+          this.results = sortedResults;
           setTimeout(() => {
             window.print();
           }, 100);
