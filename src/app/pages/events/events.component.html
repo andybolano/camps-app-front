@@ -2,9 +2,9 @@
   <div class="col-md-12 mb-4">
     <h2>Eventos del Campamento</h2>
     <div class="d-flex justify-content-between align-items-center">
-      <button class="btn btn-primary" (click)="goBack()">
-        &laquo; Volver a Campamentos
-      </button>
+      <a routerLink="/camps" class="text-decoration-none">
+        <i class="bi bi-arrow-left"></i> Volver a Campamentos
+      </a>
       <div class="d-flex gap-2">
         <button
           class="btn btn-info text-white"
@@ -23,6 +23,21 @@
   </div>
 
   <div class="col-md-12">
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar eventos por nombre o descripción..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        >
+      </div>
+    </div>
+
     <div *ngIf="isLoading" class="text-center my-5">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Cargando...</span>
@@ -33,7 +48,7 @@
       {{ errorMessage }}
     </div>
 
-    <table *ngIf="!isLoading && events.length > 0" class="table table-striped">
+    <table *ngIf="!isLoading && filteredEvents.length > 0" class="table table-striped">
       <thead>
         <tr>
           <th>Nombre</th>
@@ -44,14 +59,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let event of events">
+        <tr *ngFor="let event of filteredEvents">
           <td>{{ event.name }}</td>
           <td>{{ event.description }}</td>
           <td>
             <span *ngIf="event.items && event.items.length > 0">
-              {{ event.items.length }} ítems de calificación ({{
-                getTotalPercentage(event)
-              }}% total)
+              {{ event.items.length }} <small>Items de calificación</small>
             </span>
             <span *ngIf="!event.items || event.items.length === 0">
               Sin ítems de calificación
@@ -79,14 +92,14 @@
                 class="btn btn-sm btn-outline-primary"
                 [routerLink]="['/camps', campId, 'events', event.id, 'edit']"
               >
-                Editar
+                <i class="bi bi-pencil"></i>
               </button>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-danger"
                 (click)="onDeleteEvent(event.id)"
               >
-                Eliminar
+                <i class="bi bi-trash"></i>
               </button>
             </div>
           </td>
@@ -94,9 +107,8 @@
       </tbody>
     </table>
 
-    <div *ngIf="!isLoading && events.length === 0" class="alert alert-info">
-      No hay eventos registrados para este campamento. Haga clic en "Nuevo
-      Evento" para comenzar.
+    <div *ngIf="!isLoading && filteredEvents.length === 0" class="alert alert-info">
+      No se encontraron eventos que coincidan con la búsqueda.
     </div>
   </div>
 </div>

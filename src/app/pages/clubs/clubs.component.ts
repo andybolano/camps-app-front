@@ -4,16 +4,19 @@ import { RouterLink } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { Club, ClubService } from '../../services/club.service';
 import { CampService } from '../../services/camp.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-clubs',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe],
+  imports: [CommonModule, RouterLink, CurrencyPipe, FormsModule],
   templateUrl: './clubs.component.html',
   styleUrl: './clubs.component.scss',
 })
 export class ClubsComponent implements OnInit {
   clubs: Club[] = [];
+  filteredClubs: Club[] = [];
+  searchTerm = '';
   campId!: number;
   campName = 'Cargando...';
   isLoading = false;
@@ -22,7 +25,7 @@ export class ClubsComponent implements OnInit {
   constructor(
     private clubService: ClubService,
     private campService: CampService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +57,8 @@ export class ClubsComponent implements OnInit {
 
     this.clubService.getClubsByCamp(campId).subscribe({
       next: (clubs) => {
-        this.clubs = clubs;
+        this.clubs = clubs.sort((a, b) => a.name.localeCompare(b.name));
+        this.filteredClubs = [...this.clubs];
         this.isLoading = false;
       },
       error: (error) => {
@@ -62,6 +66,22 @@ export class ClubsComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  filterClubs(): void {
+    if (!this.searchTerm) {
+      this.filteredClubs = [...this.clubs];
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.filteredClubs = this.clubs.filter((club) =>
+      club.name.toLowerCase().includes(searchLower)
+    );
+  }
+
+  onSearchChange(): void {
+    this.filterClubs();
   }
 
   onDeleteClub(id: number): void {

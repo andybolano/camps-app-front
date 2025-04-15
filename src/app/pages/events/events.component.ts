@@ -2,16 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { Event, EventService } from '../../services/event.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, FormsModule],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss',
 })
 export class EventsComponent implements OnInit {
   events: Event[] = [];
+  filteredEvents: Event[] = [];
+  searchTerm = '';
   campId: number = 0;
   campName: string = '';
   isLoading = false;
@@ -20,7 +23,7 @@ export class EventsComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +44,8 @@ export class EventsComponent implements OnInit {
 
     this.eventService.getEventsByCampId(this.campId).subscribe({
       next: (events) => {
-        this.events = events;
+        this.events = events.sort((a, b) => a.name.localeCompare(b.name));
+        this.filteredEvents = [...this.events];
         this.isLoading = false;
       },
       error: (error) => {
@@ -49,6 +53,25 @@ export class EventsComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  filterEvents(): void {
+    if (!this.searchTerm) {
+      this.filteredEvents = [...this.events];
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.filteredEvents = this.events.filter(
+      (event) =>
+        event.name.toLowerCase().includes(searchLower) ||
+        (event.description &&
+          event.description.toLowerCase().includes(searchLower))
+    );
+  }
+
+  onSearchChange(): void {
+    this.filterEvents();
   }
 
   onDeleteEvent(id: number): void {
@@ -94,7 +117,7 @@ export class EventsComponent implements OnInit {
     }
     return event.items.reduce(
       (total: number, item: any) => total + (item.percentage || 0),
-      0,
+      0
     );
   }
 }

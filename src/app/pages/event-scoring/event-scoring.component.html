@@ -3,9 +3,9 @@
     <div class="col-12 mb-4">
       <h2>Calificar Evento</h2>
       <h5 *ngIf="event" class="text-muted">{{ event.name }}</h5>
-      <button class="btn btn-primary" (click)="goBack()">
-        &laquo; Volver a Eventos
-      </button>
+      <a class="text-decoration-none" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i> Volver a Eventos
+      </a>
     </div>
 
     <div *ngIf="isLoading" class="col-12 text-center my-5">
