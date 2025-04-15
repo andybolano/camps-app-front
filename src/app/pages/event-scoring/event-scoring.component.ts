@@ -16,11 +16,19 @@ import {
   MemberBasedResultScore,
 } from '../../services/result.service';
 import { ClubService, Club } from '../../services/club.service';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-event-scoring',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    NgSelectModule,
+    FormsModule,
+  ],
   templateUrl: './event-scoring.component.html',
   styleUrl: './event-scoring.component.scss',
 })

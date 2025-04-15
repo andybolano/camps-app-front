@@ -58,20 +58,21 @@
             <div class="card-body">
               <div class="mb-3">
                 <label for="clubId" class="form-label">Club*</label>
-                <select
-                  class="form-select"
+                <ng-select
                   id="clubId"
+                  [items]="clubs"
+                  bindLabel="name"
+                  bindValue="id"
+                  [searchable]="true"
+                  [clearable]="true"
+                  placeholder="Buscar club..."
                   formControlName="clubId"
                   [class.is-invalid]="
                     scoringForm.get('clubId')?.invalid &&
                     scoringForm.get('clubId')?.touched
                   "
                 >
-                  <option [ngValue]="null">-- Seleccione un club --</option>
-                  <option *ngFor="let club of clubs" [ngValue]="club.id">
-                    {{ club.name }}
-                  </option>
-                </select>
+                </ng-select>
                 <div
                   class="invalid-feedback"
                   *ngIf="
