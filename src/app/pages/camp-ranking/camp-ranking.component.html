@@ -122,7 +122,6 @@
                   <th>Club</th>
                   <th>Ciudad</th>
                   <th class="text-center" style="width: 120px">Puntuación</th>
-                  <th>Eventos</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,22 +140,6 @@
                   <td>{{ item.club.city }}</td>
                   <td class="text-center fw-bold">
                     {{ item.totalScore | number : "1.1-1" }}
-                  </td>
-                  <td>
-                    <div class="d-flex flex-wrap gap-1">
-                      <span
-                        *ngFor="let eventResult of item.eventResults"
-                        class="badge bg-secondary text-white"
-                        [title]="
-                          eventResult.event.name +
-                          ': ' +
-                          (eventResult.score | number : '1.1-1') +
-                          ' pts'
-                        "
-                      >
-                        {{ eventResult.event.name }}
-                      </span>
-                    </div>
                   </td>
                 </tr>
               </tbody>
