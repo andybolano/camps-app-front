@@ -1,0 +1,38 @@
+:host ::ng-deep {
+  .ng-select {
+    .ng-select-container {
+      border-color: #dee2e6;
+      min-height: 38px;
+      border-radius: 0.375rem;
+      
+      &:hover {
+        border-color: #86b7fe;
+      }
+      
+      &.ng-select-focused {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+    }
+    
+    .ng-dropdown-panel {
+      border-color: #dee2e6;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      
+      .ng-dropdown-panel-items {
+        .ng-option {
+          padding: 0.375rem 0.75rem;
+          
+          &.ng-option-marked {
+            background-color: #e9ecef;
+          }
+          
+          &.ng-option-selected {
+            background-color: #0d6efd;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}

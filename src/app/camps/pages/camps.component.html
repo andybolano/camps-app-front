@@ -1,0 +1,101 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>Campamentos</h2>
+    <button class="btn btn-success" routerLink="/camps/new">
+      Nuevo Campamento
+    </button>
+  </div>
+  <div class="col-md-12">
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && camps.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Logo</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let camp of camps">
+          <td style="width: 80px; text-align: center;">
+            <div *ngIf="camp.logoUrl" class="camp-logo">
+              <img [src]="camp.logoUrl" alt="Logo" class="img-thumbnail" style="max-width: 60px; max-height: 60px;"
+                   onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'bi bi-exclamation-triangle text-warning\' style=\'font-size: 1.5rem;\'></i>'">
+            </div>
+            <div *ngIf="!camp.logoUrl" class="camp-no-logo text-muted">
+              <i class="bi bi-image" style="font-size: 1.5rem;"></i>
+            </div>
+          </td>
+          <td>{{ camp.name }}</td>
+          <td>{{ camp.location }}</td>
+          <td>{{ camp.startDate | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ camp.endDate | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                [routerLink]="['/camps', camp.id, 'edit']"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success"
+                [routerLink]="['/camps', camp.id, 'clubs']"
+              >
+                Clubes
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-info"
+                [routerLink]="['/camps', camp.id, 'events']"
+              >
+                Eventos
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-warning"
+                [routerLink]="['/camps', camp.id, 'ranking']"
+              >
+                Ranking
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm"
+                [class.btn-outline-danger]="!hasCampRelatedData(camp)"
+                [class.btn-outline-secondary]="hasCampRelatedData(camp)"
+                [disabled]="hasCampRelatedData(camp)"
+                [title]="getCampDeleteTooltip(camp)"
+                (click)="onDeleteCamp(camp.id)"
+              >
+                <i class="bi"
+                  [class.bi-trash]="!hasCampRelatedData(camp)"
+                  [class.bi-lock]="hasCampRelatedData(camp)"
+                ></i>
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && camps.length === 0" class="alert alert-info">
+      No hay campamentos registrados. Haga clic en "Nuevo Campamento" para
+      comenzar.
+    </div>
+  </div>
+</div>

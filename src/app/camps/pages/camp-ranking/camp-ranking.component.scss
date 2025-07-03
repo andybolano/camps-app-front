@@ -1,0 +1,38 @@
+.medal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.medal-gold {
+  background: linear-gradient(145deg, #ffd700, #ffa500);
+  border: 2px solid #ffd700;
+  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+}
+
+.medal-silver {
+  background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+  border: 2px solid #c0c0c0;
+  box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
+}
+
+.medal-bronze {
+  background: linear-gradient(145deg, #cd7f32, #b87333);
+  border: 2px solid #cd7f32;
+  box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
+}
+
+// Animación para resaltar medallas
+.medal {
+  transition: transform 0.3s ease;
+}
+
+.medal:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,114 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>Eventos del Campamento</h2>
+    <div class="d-flex justify-content-between align-items-center">
+      <a routerLink="/camps" class="text-decoration-none">
+        <i class="bi bi-arrow-left"></i> Volver a Campamentos
+      </a>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-info text-white"
+          [routerLink]="['/camps', campId, 'ranking']"
+        >
+          <i class="bi bi-trophy"></i> Ver Ranking General
+        </button>
+        <button
+          class="btn btn-success"
+          [routerLink]="['/camps', campId, 'events', 'new']"
+        >
+          Nuevo Evento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar eventos por nombre o descripción..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        >
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && filteredEvents.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Planilla de Calificación</th>
+          <th>Calificar</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of filteredEvents">
+          <td>{{ event.name }}</td>
+          <td>{{ event.description }}</td>
+          <td>
+            <span *ngIf="event.items && event.items.length > 0">
+              {{ event.items.length }} <small>Items de calificación</small>
+            </span>
+            <span *ngIf="!event.items || event.items.length === 0">
+              Sin ítems de calificación
+            </span>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-success"
+              [routerLink]="['/camps', campId, 'events', event.id, 'score']"
+              [disabled]="
+                !event.items ||
+                event.items.length === 0 &&
+                (!event.memberBasedItems ||
+                event.memberBasedItems.length === 0)
+              "
+            >
+              Calificar
+            </button>
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                [routerLink]="['/camps', campId, 'events', event.id, 'edit']"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onDeleteEvent(event.id)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && filteredEvents.length === 0" class="alert alert-info">
+      No se encontraron eventos que coincidan con la búsqueda.
+    </div>
+  </div>
+</div>

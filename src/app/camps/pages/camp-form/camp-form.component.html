@@ -1,0 +1,164 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>{{ isEditMode ? 'Editar' : 'Nuevo' }} Campamento</h2>
+  </div>
+  <div class="col-md-12">
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="campForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              formControlName="name"
+              required
+            />
+            <div
+              *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="name?.errors?.['required']"
+                >El nombre es requerido</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="location" class="form-label">Ubicación</label>
+            <input
+              type="text"
+              class="form-control"
+              id="location"
+              formControlName="location"
+              required
+            />
+            <div
+              *ngIf="location?.invalid && (location?.dirty || location?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="location?.errors?.['required']"
+                >La ubicación es requerida</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Fecha de Inicio</label>
+            <input
+              type="date"
+              class="form-control"
+              id="startDate"
+              formControlName="startDate"
+              required
+            />
+            <div
+              *ngIf="startDate?.invalid && (startDate?.dirty || startDate?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="startDate?.errors?.['required']"
+                >La fecha de inicio es requerida</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="endDate" class="form-label">Fecha de Fin</label>
+            <input
+              type="date"
+              class="form-control"
+              id="endDate"
+              formControlName="endDate"
+              required
+            />
+            <div
+              *ngIf="endDate?.invalid && (endDate?.dirty || endDate?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="endDate?.errors?.['required']"
+                >La fecha de fin es requerida</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea
+              class="form-control"
+              id="description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="logo" class="form-label">Logo del Campamento</label>
+            
+            <!-- Previsualización de logo -->
+            <div class="mb-3 text-center">
+              <div *ngIf="logoPreview" class="mb-2">
+                <img [src]="logoPreview" alt="Logo Preview" class="img-thumbnail" style="max-height: 200px;">
+              </div>
+              <div *ngIf="!logoPreview && currentLogo" class="mb-2">
+                <img [src]="currentLogo" alt="Current Logo" class="img-thumbnail" style="max-height: 200px;" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display: none;" class="alert alert-warning">Error al cargar la imagen</div>
+                <p class="small text-muted mt-1">Logo actual</p>
+              </div>
+              <div *ngIf="!logoPreview && !currentLogo" class="border p-3 mb-2 text-center text-muted">
+                <i class="bi bi-image" style="font-size: 3rem;"></i>
+                <p>No hay logo</p>
+              </div>
+            </div>
+            
+            <!-- Input para seleccionar archivo -->
+            <input
+              type="file"
+              class="form-control"
+              id="logo"
+              accept="image/*"
+              (change)="onLogoChange($event)"
+            />
+            <div class="form-text">Seleccione una imagen para el logo (opcional)</div>
+            
+            <!-- Botón para limpiar logo -->
+            <button 
+              *ngIf="logoPreview" 
+              type="button" 
+              class="btn btn-sm btn-outline-secondary mt-2" 
+              (click)="clearLogo()"
+            >
+              Quitar logo seleccionado
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button
+          type="submit"
+          [disabled]="campForm.invalid || isLoading"
+          class="btn btn-primary"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Guardar
+        </button>
+        <button type="button" class="btn btn-secondary" routerLink="/camps">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

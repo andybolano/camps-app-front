@@ -1,0 +1,125 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <h2>Clubes - {{ campName }}</h2>
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <a routerLink="/camps" class="text-decoration-none">
+        <i class="bi bi-arrow-left"></i> Volver a Campamentos
+      </a>
+      <button
+        class="btn btn-success"
+        [routerLink]="['/camps', campId, 'clubs', 'new']"
+      >
+        Nuevo Club
+      </button>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="mb-3">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar club por nombre..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        >
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && filteredClubs.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Escudo</th>
+          <th>Nombre</th>
+          <th>Ciudad</th>
+          <th>Guías Bautizados</th>
+          <th>Guías No Bautizados</th>
+          <th>Total Guías</th>
+          <th>Inscripción</th>
+          <th>Pagado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let club of filteredClubs">
+          <td class="text-center">
+            <div *ngIf="club.shieldUrl" class="club-shield">
+              <img 
+                [src]="club.shieldUrl" 
+                alt="Shield" 
+                class="img-thumbnail" 
+                style="max-height: 40px;"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display: none;" class="club-no-shield">
+                <i class="bi bi-shield" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+            <div *ngIf="!club.shieldUrl" class="club-no-shield">
+              <i class="bi bi-shield" style="font-size: 1.5rem;"></i>
+            </div>
+          </td>
+          <td>{{ club.name }}</td>
+          <td>{{ club.city }}</td>
+          <td>{{ club.participantsCount }}</td>
+          <td>{{ club.guestsCount }}</td>
+          <td>
+            {{ club.participantsCount + club.guestsCount }}
+          </td>
+          <td>{{ club.registrationFee | currency }}</td>
+          <td>
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-check-circle-fill text-success': club.isPaid,
+                'bi-x-circle-fill text-danger': !club.isPaid
+              }"
+            ></i>
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                [routerLink]="['/camps', campId, 'clubs', club.id]"
+                title="Ver detalles y resultados del club"
+              >
+                <i class="bi bi-eye"></i> Ver
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                [routerLink]="['/camps', campId, 'clubs', club.id, 'edit']"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="onDeleteClub(club.id)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && filteredClubs.length === 0" class="alert alert-info">
+      No se encontraron clubes que coincidan con la búsqueda.
+    </div>
+  </div>
+</div>

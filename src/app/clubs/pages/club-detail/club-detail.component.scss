@@ -1,0 +1,144 @@
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: none;
+  
+  .card-header {
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+.list-group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  strong {
+    color: #495057;
+  }
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.35em 0.65em;
+}
+
+.img-thumbnail {
+  border: 2px solid #dee2e6;
+  padding: 3px;
+}
+
+// Estilos para el modal
+.modal {
+  .modal-header {
+    border-bottom: 0;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .display-6 {
+    font-size: 2rem;
+  }
+  
+  .table {
+    th {
+      background-color: #f8f9fa;
+    }
+    
+    tfoot {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Estilos para impresión
+@media print {
+  @page {
+    margin: 0;
+    size: A4;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  .d-print-block,
+  .d-print-block * {
+    visibility: visible;
+  }
+  
+  .d-print-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2cm;
+  }
+
+  // Estilos para la tabla de impresión
+  .d-print-block {
+    h4 {
+      font-size: 24px;
+      margin-bottom: 1rem;
+      color: #000;
+    }
+    
+    h5 {
+      font-size: 18px;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      
+      th {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        font-weight: bold;
+        text-align: left;
+      }
+      
+      td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+      }
+      
+      .text-end {
+        text-align: right;
+      }
+      
+      .text-center {
+        text-align: center;
+      }
+    }
+    
+    .table-sm {
+      th, td {
+        padding: 0.3rem;
+      }
+    }
+  }
+
+  // Ocultar elementos del navegador
+  ::ng-deep {
+    .navbar,
+    .breadcrumb,
+    .page-header,
+    .page-footer,
+    .page-title,
+    .page-url,
+    header,
+    footer,
+    .header,
+    .footer {
+      display: none !important;
+    }
+  }
+} 

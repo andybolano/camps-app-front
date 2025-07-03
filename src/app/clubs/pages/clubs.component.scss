@@ -1,0 +1,23 @@
+.club-shield, .club-no-shield {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+.club-no-shield {
+  color: #adb5bd;
+}
+
+.table th {
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+// Añadir espacio entre botones del grupo
+.btn-group .btn {
+  margin-right: 3px;
+}
