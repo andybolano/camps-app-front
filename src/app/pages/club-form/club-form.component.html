@@ -50,7 +50,7 @@
 
           <div class="mb-3">
             <label for="participantsCount" class="form-label"
-              >Guías Bautizados</label
+              >Miembros Bautizados</label
             >
             <input
               type="number"
@@ -68,7 +68,7 @@
               class="text-danger"
             >
               <small *ngIf="participantsCount?.errors?.['required']"
-                >El número de guías bautizados es requerido</small
+                >El número de miembros bautizados es requerido</small
               >
               <small *ngIf="participantsCount?.errors?.['min']"
                 >El número debe ser mayor o igual a 0</small
@@ -77,7 +77,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="guestsCount" class="form-label">Guías No Bautizados</label>
+            <label for="guestsCount" class="form-label">Miembros No Bautizados</label>
             <input
               type="number"
               class="form-control"
@@ -93,7 +93,7 @@
               class="text-danger"
             >
               <small *ngIf="guestsCount?.errors?.['required']"
-                >El número de guías no bautizados es requerido</small
+                >El número de miembros no bautizados es requerido</small
               >
               <small *ngIf="guestsCount?.errors?.['min']"
                 >El número debe ser mayor o igual a 0</small
@@ -102,7 +102,7 @@
           </div>
           
           <div class="mb-3">
-            <label for="minorsCount" class="form-label">Guías Menores</label>
+            <label for="minorsCount" class="form-label">Miembros Menores</label>
             <input
               type="number"
               class="form-control"
@@ -118,7 +118,7 @@
               class="text-danger"
             >
               <small *ngIf="minorsCount?.errors?.['required']"
-                >El número de guías menores es requerido</small
+                >El número de miembros menores es requerido</small
               >
               <small *ngIf="minorsCount?.errors?.['min']"
                 >El número debe ser mayor o igual a 0</small

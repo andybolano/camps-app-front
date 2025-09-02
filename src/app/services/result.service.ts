@@ -17,25 +17,54 @@ export interface MemberBasedResultScore {
 
 export interface Result {
   id?: number;
-  eventId: number;
-  clubId: number;
+  eventId?: number;
+  clubId?: number;
   event?: {
     id: number;
     name: string;
     date?: string;
     description?: string;
     type?: 'REGULAR' | 'MEMBER_BASED';
+    maxScore?: number;
   };
   totalScore?: number;
   rank?: number;
   club?: {
     id: number;
     name: string;
+    city?: string;
+    participantsCount?: number;
+    guestsCount?: number;
+    minorsCount?: number;
+    economsCount?: number;
+    companionsCount?: number;
+    directorCount?: number;
+    pastorCount?: number;
+    registrationFee?: number;
+    isPaid?: boolean;
+    shieldUrl?: string;
   };
   scores?: ResultScore[];
-  items?: ResultScore[];
+  items?: Array<{
+    id: number;
+    score: number;
+    eventItemId?: number; // Para compatibilidad con código existente
+    eventItem: {
+      id: number;
+      name: string;
+    };
+  }>;
   memberBasedScores?: MemberBasedResultScore[];
-  memberBasedItems?: MemberBasedResultScore[];
+  memberBasedItems?: Array<{
+    id: number;
+    matchCount: number;
+    totalWithCharacteristic: number;
+    eventItemId?: number; // Para compatibilidad con código existente
+    eventItem: {
+      id: number;
+      name: string;
+    };
+  }>;
   resultDetail?: {
     eventName: string;
     eventDate?: string;
@@ -60,9 +89,8 @@ export class ResultService {
 
   // Obtener resultados por evento
   getResultsByEvent(eventId: number): Observable<Result[]> {
-    return this.http
-      .get<Result[]>(`${this.apiUrl}?eventId=${eventId}`)
-      .pipe(map((results) => this.normalizeResults(results)));
+    return this.http.get<Result[]>(`${this.apiUrl}?eventId=${eventId}`)
+      .pipe(map((results) => this.normalizeResultsWithEventItemId(results)));
   }
 
   // Obtener un resultado específico (por id)
@@ -245,5 +273,36 @@ export class ResultService {
         return this.normalizeResults(results);
       }),
     );
+  }
+
+  // Bulk scoring - crear/actualizar resultados para múltiples clubes
+  createBulkResults(bulkResultData: any): Observable<any> {
+    console.log('Enviando resultados en lote:', bulkResultData);
+    return this.http.post<any>(`${this.apiUrl}/bulk`, bulkResultData);
+  }
+
+  // Normalizar resultados para añadir eventItemId para compatibilidad
+  private normalizeResultsWithEventItemId(results: Result[]): Result[] {
+    return results.map(result => {
+      const normalizedResult = { ...result };
+      
+      // Añadir eventItemId a items
+      if (normalizedResult.items) {
+        normalizedResult.items = normalizedResult.items.map(item => ({
+          ...item,
+          eventItemId: item.eventItem.id
+        }));
+      }
+      
+      // Añadir eventItemId a memberBasedItems
+      if (normalizedResult.memberBasedItems) {
+        normalizedResult.memberBasedItems = normalizedResult.memberBasedItems.map(item => ({
+          ...item,
+          eventItemId: item.eventItem.id
+        }));
+      }
+      
+      return normalizedResult;
+    });
   }
 }
