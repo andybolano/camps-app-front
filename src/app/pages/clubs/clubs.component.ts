@@ -21,6 +21,12 @@ export class ClubsComponent implements OnInit {
   campName = 'Cargando...';
   isLoading = false;
   errorMessage = '';
+  
+  // Modal de confirmación de eliminación
+  clubToDelete: Club | null = null;
+  confirmationText = '';
+  canConfirmDelete = false;
+  isDeletingClub = false;
 
   constructor(
     private clubService: ClubService,
@@ -85,19 +91,57 @@ export class ClubsComponent implements OnInit {
   }
 
   onDeleteClub(id: number): void {
-    if (!confirm('¿Está seguro de que desea eliminar este club?')) {
-      return;
+    const club = this.clubs.find(c => c.id === id);
+    if (!club) return;
+    
+    this.clubToDelete = club;
+    this.confirmationText = '';
+    this.canConfirmDelete = false;
+    this.isDeletingClub = false;
+    
+    // Mostrar el modal usando Bootstrap
+    const modalElement = document.getElementById('deleteClubModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
 
-    this.isLoading = true;
-    this.clubService.deleteClub(id).subscribe({
+  onConfirmationTextChange(): void {
+    this.canConfirmDelete = this.confirmationText === this.clubToDelete?.name;
+  }
+
+  cancelDelete(): void {
+    this.clubToDelete = null;
+    this.confirmationText = '';
+    this.canConfirmDelete = false;
+    this.isDeletingClub = false;
+  }
+
+  confirmDelete(): void {
+    if (!this.clubToDelete || !this.canConfirmDelete) return;
+
+    this.isDeletingClub = true;
+    const clubId = this.clubToDelete.id;
+
+    this.clubService.deleteClub(clubId).subscribe({
       next: () => {
+        // Ocultar el modal
+        const modalElement = document.getElementById('deleteClubModal');
+        if (modalElement) {
+          const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+          modal?.hide();
+        }
+        
+        // Limpiar estado del modal
+        this.cancelDelete();
+        
         // Recargar la lista completa desde el servidor para asegurar sincronización
         this.loadClubs(this.campId);
       },
       error: (error) => {
         this.errorMessage = 'Error al eliminar el club: ' + error.message;
-        this.isLoading = false;
+        this.isDeletingClub = false;
       },
     });
   }

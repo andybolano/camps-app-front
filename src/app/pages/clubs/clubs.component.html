@@ -123,3 +123,70 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de confirmación para eliminación de club -->
+<div class="modal fade" id="deleteClubModal" tabindex="-1" aria-labelledby="deleteClubModalLabel" aria-hidden="true" *ngIf="clubToDelete">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteClubModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Confirmar Eliminación de Club
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning mb-3">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>¡ATENCIÓN!</strong> Esta acción es <strong>irreversible</strong> y eliminará permanentemente el club y todos los datos asociados.
+        </div>
+        
+        <p class="mb-3">
+          Está a punto de eliminar el club <strong>"{{ clubToDelete.name }}"</strong>.
+        </p>
+        
+        <p class="mb-3 text-danger">
+          Se eliminarán todos los datos relacionados incluyendo:
+        </p>
+        <ul class="text-danger mb-3">
+          <li>Información del club</li>
+          <li>Calificaciones y resultados en eventos</li>
+          <li>Historial de participación</li>
+          <li>Archivos y documentos asociados</li>
+        </ul>
+        
+        <div class="mb-3">
+          <label for="confirmClubName" class="form-label">
+            Para confirmar, escriba el nombre exacto del club: <strong>{{ clubToDelete.name }}</strong>
+          </label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="confirmClubName"
+            [(ngModel)]="confirmationText"
+            placeholder="Escriba el nombre del club aquí"
+            (input)="onConfirmationTextChange()"
+          >
+          <div class="form-text text-muted">
+            El botón de confirmar se habilitará cuando escriba el nombre exacto.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cancelDelete()">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-danger" 
+          [disabled]="!canConfirmDelete || isDeletingClub"
+          (click)="confirmDelete()"
+        >
+          <span *ngIf="isDeletingClub" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!isDeletingClub" class="bi bi-trash me-2"></i>
+          {{ isDeletingClub ? 'Eliminando...' : 'Eliminar Club' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
