@@ -92,8 +92,8 @@ export class ClubsComponent implements OnInit {
     this.isLoading = true;
     this.clubService.deleteClub(id).subscribe({
       next: () => {
-        this.clubs = this.clubs.filter((club) => club.id !== id);
-        this.isLoading = false;
+        // Recargar la lista completa desde el servidor para asegurar sincronización
+        this.loadClubs(this.campId);
       },
       error: (error) => {
         this.errorMessage = 'Error al eliminar el club: ' + error.message;
