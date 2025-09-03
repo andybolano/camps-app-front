@@ -27,13 +27,23 @@ export class CampsComponent implements OnInit {
 
     this.campService.getCamps().subscribe({
       next: (camps) => {
-        this.camps = camps;
+        this.camps = this.sortCampsByStartDate(camps);
         this.isLoading = false;
       },
       error: (error) => {
         this.errorMessage = 'Error al cargar los campamentos: ' + error.message;
         this.isLoading = false;
       },
+    });
+  }
+
+  // Ordenar campamentos por fecha de inicio (más recientes primero)
+  private sortCampsByStartDate(camps: Camp[]): Camp[] {
+    return camps.sort((a, b) => {
+      const dateA = new Date(a.startDate);
+      const dateB = new Date(b.startDate);
+      // Ordenar por fecha descendente (más reciente primero)
+      return dateB.getTime() - dateA.getTime();
     });
   }
 
