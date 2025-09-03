@@ -53,7 +53,7 @@ export class CampRankingComponent implements OnInit {
 
     this.resultService.getClubRankingByCamp(this.campId).subscribe({
       next: (data) => {
-        this.rankingData = data;
+        this.rankingData = this.sortRankingData(data);
         this.isLoading = false;
       },
       error: (error) => {
@@ -61,6 +61,26 @@ export class CampRankingComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  // Ordenar datos del ranking por puntaje y luego alfabéticamente
+  private sortRankingData(data: any[]): any[] {
+    // Ordenar por puntaje descendente y luego alfabéticamente por nombre
+    const sortedData = data.sort((a, b) => {
+      // Primero comparar por puntaje (descendente)
+      const scoreDiff = b.totalScore - a.totalScore;
+      if (scoreDiff !== 0) {
+        return scoreDiff;
+      }
+      // Si los puntajes son iguales, ordenar alfabéticamente (ascendente)
+      return a.club.name.localeCompare(b.club.name);
+    });
+
+    // Recalcular los rankings después del ordenamiento
+    return sortedData.map((item, index) => ({
+      ...item,
+      rank: index + 1
+    }));
   }
 
   // Obtener las clases para la medalla según la posición

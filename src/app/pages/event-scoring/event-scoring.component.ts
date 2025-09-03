@@ -157,11 +157,20 @@ export class EventScoringComponent implements OnInit {
     
     const clubsWithIndex = this.clubsFormArray.controls.map((control, index) => ({
       index,
-      total: this.calculateClubTotal(index)
+      total: this.calculateClubTotal(index),
+      clubName: control.get('clubName')?.value || ''
     }));
     
-    // Ordenar por total descendente (mayor a menor)
-    clubsWithIndex.sort((a, b) => b.total - a.total);
+    // Ordenar por total descendente (mayor a menor) y luego alfabéticamente por nombre
+    clubsWithIndex.sort((a, b) => {
+      // Primero comparar por puntaje (descendente)
+      const scoreDiff = b.total - a.total;
+      if (scoreDiff !== 0) {
+        return scoreDiff;
+      }
+      // Si los puntajes son iguales, ordenar alfabéticamente (ascendente)
+      return a.clubName.localeCompare(b.clubName);
+    });
     
     this.staticSortedClubIndices = clubsWithIndex.map(club => club.index);
   }

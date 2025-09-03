@@ -91,7 +91,7 @@
                       </span>
                     </td>
                     <td class="fw-bold align-middle">
-                      {{ clubsFormArray.at(clubIndex)?.get('clubName')?.value }}
+                      {{ clubsFormArray.at(clubIndex).get('clubName')?.value }}
                       <div *ngIf="isClubTotalExceeded(clubIndex)" class="text-danger small">
                         <i class="bi bi-exclamation-triangle"></i> Puntaje excedido
                       </div>
@@ -166,7 +166,7 @@
                         </span>
                       </td>
                       <td class="fw-bold align-middle">
-                        {{ clubsFormArray.at(clubIndex)?.get('clubName')?.value }}
+                        {{ clubsFormArray.at(clubIndex).get('clubName')?.value }}
                       </td>
                       <td formGroupName="memberBasedScores">
                         <div [formGroupName]="item.id!.toString()">
@@ -223,7 +223,7 @@
                       </span>
                     </td>
                     <td class="fw-bold">
-                      {{ clubsFormArray.at(clubIndex)?.get('clubName')?.value }}
+                      {{ clubsFormArray.at(clubIndex).get('clubName')?.value }}
                     </td>
                     <td class="text-center">
                       <span class="badge bg-success fs-6">
