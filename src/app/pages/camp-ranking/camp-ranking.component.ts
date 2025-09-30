@@ -17,6 +17,7 @@ export class CampRankingComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   rankingData: any[] = [];
+  allEvents: any[] = [];
 
   constructor(
     private resultService: ResultService,
@@ -54,6 +55,7 @@ export class CampRankingComponent implements OnInit {
     this.resultService.getClubRankingByCamp(this.campId).subscribe({
       next: (data) => {
         this.rankingData = this.sortRankingData(data);
+        this.extractAllEvents(data);
         this.isLoading = false;
       },
       error: (error) => {
@@ -61,6 +63,30 @@ export class CampRankingComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  // Extraer todos los eventos únicos de los datos de ranking
+  private extractAllEvents(data: any[]): void {
+    const eventsMap = new Map();
+
+    data.forEach(clubData => {
+      clubData.eventResults.forEach((eventResult: any) => {
+        if (!eventsMap.has(eventResult.event.id)) {
+          eventsMap.set(eventResult.event.id, eventResult.event);
+        }
+      });
+    });
+
+    // Convertir a array y ordenar alfabéticamente por nombre del evento
+    this.allEvents = Array.from(eventsMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  // Obtener puntaje de un club para un evento específico
+  getEventScore(clubData: any, eventId: number): number {
+    const eventResult = clubData.eventResults.find((er: any) => er.event.id === eventId);
+    return eventResult ? eventResult.score : 0;
   }
 
   // Ordenar datos del ranking por puntaje y luego alfabéticamente

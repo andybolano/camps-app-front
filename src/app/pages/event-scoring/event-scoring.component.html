@@ -105,8 +105,8 @@
                         [max]="event.maxScore || 100"
                         step="0.1"
                         [class.is-invalid]="
-                          clubsFormArray.at(clubIndex)?.get('scores')?.get(item.id!.toString())?.invalid &&
-                          clubsFormArray.at(clubIndex)?.get('scores')?.get(item.id!.toString())?.touched ||
+                          clubsFormArray.at(clubIndex).get('scores')?.get(item.id!.toString())?.invalid &&
+                          clubsFormArray.at(clubIndex).get('scores')?.get(item.id!.toString())?.touched ||
                           isClubTotalExceeded(clubIndex)
                         "
                       />
