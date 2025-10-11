@@ -23,7 +23,7 @@ export class CampRankingComponent implements OnInit {
     private resultService: ResultService,
     private campService: CampService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +69,7 @@ export class CampRankingComponent implements OnInit {
   private extractAllEvents(data: any[]): void {
     const eventsMap = new Map();
 
-    data.forEach(clubData => {
+    data.forEach((clubData) => {
       clubData.eventResults.forEach((eventResult: any) => {
         if (!eventsMap.has(eventResult.event.id)) {
           eventsMap.set(eventResult.event.id, eventResult.event);
@@ -85,7 +85,9 @@ export class CampRankingComponent implements OnInit {
 
   // Obtener puntaje de un club para un evento específico
   getEventScore(clubData: any, eventId: number): number {
-    const eventResult = clubData.eventResults.find((er: any) => er.event.id === eventId);
+    const eventResult = clubData.eventResults.find(
+      (er: any) => er.event.id === eventId
+    );
     return eventResult ? eventResult.score : 0;
   }
 
@@ -105,7 +107,7 @@ export class CampRankingComponent implements OnInit {
     // Recalcular los rankings después del ordenamiento
     return sortedData.map((item, index) => ({
       ...item,
-      rank: index + 1
+      rank: index + 1,
     }));
   }
 
@@ -137,5 +139,68 @@ export class CampRankingComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/camps', this.campId]);
+  }
+
+  // Método para exportar la tabla a Excel
+  exportToExcel(): void {
+    if (!this.rankingData || this.rankingData.length === 0) {
+      alert('No hay datos para exportar');
+      return;
+    }
+
+    // Crear el contenido CSV
+    let csvContent = '';
+
+    // Encabezados
+    const headers = ['Posición', 'Club', 'Ciudad'];
+    this.allEvents.forEach((event) => {
+      headers.push(event.name);
+    });
+    headers.push('Total');
+
+    csvContent += headers.join(',') + '\n';
+
+    // Datos
+    this.rankingData.forEach((item) => {
+      const row = [
+        item.rank,
+        `"${item.club.name}"`, // Comillas para manejar nombres con comas
+        `"${item.club.city}"`,
+      ];
+
+      // Agregar puntajes de eventos
+      this.allEvents.forEach((event) => {
+        const score = this.getEventScore(item, event.id);
+        row.push(score.toFixed(1));
+      });
+
+      // Agregar total
+      row.push(item.totalScore.toFixed(1));
+
+      csvContent += row.join(',') + '\n';
+    });
+
+    // Crear y descargar el archivo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+
+      // Nombre del archivo con fecha y nombre del campamento
+      const campName = this.camp?.name || 'Campamento';
+      const date = new Date().toISOString().split('T')[0];
+      const fileName = `Ranking_${campName.replace(
+        /[^a-zA-Z0-9]/g,
+        '_'
+      )}_${date}.csv`;
+
+      link.setAttribute('download', fileName);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 }
