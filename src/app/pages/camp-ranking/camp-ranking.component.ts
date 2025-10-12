@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ResultService } from '../../services/result.service';
 import { CampService, Camp } from '../../services/camp.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-camp-ranking',
@@ -148,8 +149,8 @@ export class CampRankingComponent implements OnInit {
       return;
     }
 
-    // Crear el contenido CSV
-    let csvContent = '';
+    // Crear los datos para el archivo Excel
+    const worksheetData: any[][] = [];
 
     // Encabezados
     const headers = ['Posición', 'Club', 'Ciudad'];
@@ -157,50 +158,72 @@ export class CampRankingComponent implements OnInit {
       headers.push(event.name);
     });
     headers.push('Total');
+    worksheetData.push(headers);
 
-    csvContent += headers.join(',') + '\n';
-
-    // Datos
+    // Datos de cada club
     this.rankingData.forEach((item) => {
-      const row = [
-        item.rank,
-        `"${item.club.name}"`, // Comillas para manejar nombres con comas
-        `"${item.club.city}"`,
-      ];
+      const row = [item.rank, item.club.name, item.club.city];
 
       // Agregar puntajes de eventos
       this.allEvents.forEach((event) => {
         const score = this.getEventScore(item, event.id);
-        row.push(score.toFixed(1));
+        row.push(parseFloat(score.toFixed(1)));
       });
 
       // Agregar total
-      row.push(item.totalScore.toFixed(1));
+      row.push(parseFloat(item.totalScore.toFixed(1)));
 
-      csvContent += row.join(',') + '\n';
+      worksheetData.push(row);
     });
 
-    // Crear y descargar el archivo
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    // Crear el libro de trabajo
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
+    // Configurar el ancho de las columnas
+    const columnWidths = [
+      { wch: 10 }, // Posición
+      { wch: 25 }, // Club
+      { wch: 20 }, // Ciudad
+    ];
 
-      // Nombre del archivo con fecha y nombre del campamento
-      const campName = this.camp?.name || 'Campamento';
-      const date = new Date().toISOString().split('T')[0];
-      const fileName = `Ranking_${campName.replace(
-        /[^a-zA-Z0-9]/g,
-        '_'
-      )}_${date}.csv`;
+    // Ancho para columnas de eventos
+    this.allEvents.forEach(() => {
+      columnWidths.push({ wch: 12 });
+    });
 
-      link.setAttribute('download', fileName);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    // Ancho para columna total
+    columnWidths.push({ wch: 12 });
+
+    worksheet['!cols'] = columnWidths;
+
+    // Estilo para los encabezados
+    const headerStyle = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: 'E6E6FA' } },
+      alignment: { horizontal: 'center' },
+    };
+
+    // Aplicar estilo a los encabezados
+    for (let col = 0; col < headers.length; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (!worksheet[cellAddress]) worksheet[cellAddress] = {};
+      worksheet[cellAddress].s = headerStyle;
     }
+
+    // Agregar la hoja al libro
+    const sheetName = 'Ranking General';
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    // Nombre del archivo con fecha y nombre del campamento
+    const campName = this.camp?.name || 'Campamento';
+    const date = new Date().toISOString().split('T')[0];
+    const fileName = `Ranking_${campName.replace(
+      /[^a-zA-Z0-9]/g,
+      '_'
+    )}_${date}.xlsx`;
+
+    // Descargar el archivo
+    XLSX.writeFile(workbook, fileName);
   }
 }
