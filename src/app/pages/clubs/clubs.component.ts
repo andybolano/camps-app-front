@@ -1,27 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { Club, ClubService } from '../../services/club.service';
-import { CampService } from '../../services/camp.service';
 import { FormsModule } from '@angular/forms';
+import { CampRegistration, CampRegistrationService } from '../../services/camp-registration.service';
 
 @Component({
   selector: 'app-clubs',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './clubs.component.html',
   styleUrl: './clubs.component.scss',
 })
 export class ClubsComponent implements OnInit {
   clubs: Club[] = [];
   filteredClubs: Club[] = [];
+  campRegistrations: CampRegistration[] = [];
+  filteredRegistrations: CampRegistration[] = [];
   searchTerm = '';
-  campId!: number;
-  campName = 'Cargando...';
   isLoading = false;
   errorMessage = '';
-  
+  campId?: number;
+  isInCampContext = false;
+
   // Modal de confirmación de eliminación
   clubToDelete: Club | null = null;
   confirmationText = '';
@@ -30,38 +31,30 @@ export class ClubsComponent implements OnInit {
 
   constructor(
     private clubService: ClubService,
-    private campService: CampService,
+    private campRegistrationService: CampRegistrationService,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Verificar si estamos en el contexto de un campamento
     this.route.paramMap.subscribe((params) => {
       const campId = params.get('campId');
       if (campId) {
         this.campId = +campId;
-        this.loadCampData(this.campId);
-        this.loadClubs(this.campId);
+        this.isInCampContext = true;
+        this.loadCampRegistrations();
+      } else {
+        this.isInCampContext = false;
+        this.loadClubs();
       }
     });
   }
 
-  loadCampData(campId: number): void {
-    this.campService.getCamp(campId).subscribe({
-      next: (camp) => {
-        this.campName = camp.name;
-      },
-      error: (error) => {
-        this.errorMessage =
-          'Error al cargar los datos del campamento: ' + error.message;
-      },
-    });
-  }
-
-  loadClubs(campId: number): void {
+  loadClubs(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.clubService.getClubsByCamp(campId).subscribe({
+    this.clubService.getClubs().subscribe({
       next: (clubs) => {
         this.clubs = clubs.sort((a, b) => a.name.localeCompare(b.name));
         this.filteredClubs = [...this.clubs];
@@ -74,7 +67,33 @@ export class ClubsComponent implements OnInit {
     });
   }
 
+  loadCampRegistrations(): void {
+    if (!this.campId) return;
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.campRegistrationService.getCampRegistrations(this.campId).subscribe({
+      next: (registrations) => {
+        this.campRegistrations = registrations.sort((a, b) =>
+          a.clubCategory.club.name.localeCompare(b.clubCategory.club.name)
+        );
+        this.filteredRegistrations = [...this.campRegistrations];
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Error al cargar los registros del campamento: ' + error.message;
+        this.isLoading = false;
+      },
+    });
+  }
+
   filterClubs(): void {
+    if (this.isInCampContext) {
+      this.filterRegistrations();
+      return;
+    }
+
     if (!this.searchTerm) {
       this.filteredClubs = [...this.clubs];
       return;
@@ -83,6 +102,19 @@ export class ClubsComponent implements OnInit {
     const searchLower = this.searchTerm.toLowerCase();
     this.filteredClubs = this.clubs.filter((club) =>
       club.name.toLowerCase().includes(searchLower)
+    );
+  }
+
+  filterRegistrations(): void {
+    if (!this.searchTerm) {
+      this.filteredRegistrations = [...this.campRegistrations];
+      return;
+    }
+
+    const searchLower = this.searchTerm.toLowerCase();
+    this.filteredRegistrations = this.campRegistrations.filter((reg) =>
+      reg.clubCategory.club.name.toLowerCase().includes(searchLower) ||
+      reg.clubCategory.club.city.toLowerCase().includes(searchLower)
     );
   }
 
@@ -132,12 +164,12 @@ export class ClubsComponent implements OnInit {
           const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
           modal?.hide();
         }
-        
+
         // Limpiar estado del modal
         this.cancelDelete();
-        
-        // Recargar la lista completa desde el servidor para asegurar sincronización
-        this.loadClubs(this.campId);
+
+        // Recargar la lista
+        this.loadClubs();
       },
       error: (error) => {
         this.errorMessage = 'Error al eliminar el club: ' + error.message;

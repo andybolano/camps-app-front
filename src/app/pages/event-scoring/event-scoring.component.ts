@@ -67,7 +67,7 @@ export class EventScoringComponent implements OnInit {
       // Cargar evento, clubes y resultados existentes en paralelo
       const [event, clubs, existingResults] = await Promise.all([
         this.eventService.getEvent(this.eventId).toPromise(),
-        this.clubService.getClubsByCamp(this.campId).toPromise(),
+        this.clubService.getClubs().toPromise(),
         this.resultService.getResultsByEvent(this.eventId).toPromise()
       ]);
       

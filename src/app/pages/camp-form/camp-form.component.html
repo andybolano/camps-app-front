@@ -49,6 +49,33 @@
           </div>
 
           <div class="mb-3">
+            <label for="targetCategoryId" class="form-label">Categoría Objetivo</label>
+            <select
+              class="form-select"
+              id="targetCategoryId"
+              formControlName="targetCategoryId"
+              required
+            >
+              <option value="">Seleccione una categoría</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }} ({{ category.code }})
+              </option>
+            </select>
+            <div
+              *ngIf="targetCategoryId?.invalid && (targetCategoryId?.dirty || targetCategoryId?.touched)"
+              class="text-danger"
+            >
+              <small *ngIf="targetCategoryId?.errors?.['required']"
+                >La categoría es requerida</small
+              >
+            </div>
+            <div *ngIf="loadingCategories" class="form-text">
+              <span class="spinner-border spinner-border-sm me-1"></span>
+              Cargando categorías...
+            </div>
+          </div>
+
+          <div class="mb-3">
             <label for="startDate" class="form-label">Fecha de Inicio</label>
             <input
               type="date"

@@ -6,26 +6,36 @@ import { environment } from '../../environments/environment';
 export interface Event {
   id: number;
   name: string;
-  description: string;
-  type?: 'REGULAR' | 'MEMBER_BASED';
+  description?: string;
+  type: 'REGULAR' | 'MEMBER_BASED';
   date?: string;
-  maxScore?: number;
-  camp: {
+  maxScore: number;
+  camp?: {
     id: number;
     name?: string;
   };
   items?: {
     id?: number;
     name: string;
-    percentage: number;
+    percentage?: number;
   }[];
   memberBasedItems?: {
     id?: number;
     name: string;
-    percentage: number;
-    applicableCharacteristics: string[];
+    percentage?: number;
+    applicableCharacteristics?: string[];
     calculationType?: string;
     isRequired?: boolean;
+  }[];
+}
+
+export interface CreateEventDto {
+  name: string;
+  description?: string;
+  maxScore: number;
+  type: 'REGULAR' | 'MEMBER_BASED';
+  items?: {
+    name: string;
   }[];
 }
 
@@ -37,6 +47,10 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
+  getEvents(): Observable<Event[]> {
+    return this.http.get<Event[]>(this.apiUrl);
+  }
+
   getEventsByCampId(campId: number): Observable<Event[]> {
     return this.http.get<Event[]>(`${this.apiUrl}?campId=${campId}`);
   }
@@ -45,11 +59,11 @@ export class EventService {
     return this.http.get<Event>(`${this.apiUrl}/${id}`);
   }
 
-  createEvent(event: Omit<Event, 'id'>): Observable<Event> {
+  createEvent(event: CreateEventDto): Observable<Event> {
     return this.http.post<Event>(this.apiUrl, event);
   }
 
-  updateEvent(id: number, event: Omit<Event, 'id'>): Observable<Event> {
+  updateEvent(id: number, event: Partial<CreateEventDto>): Observable<Event> {
     return this.http.patch<Event>(`${this.apiUrl}/${id}`, event);
   }
 

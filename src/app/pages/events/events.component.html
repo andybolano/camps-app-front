@@ -1,22 +1,32 @@
 <div class="row">
   <div class="col-md-12 mb-4">
-    <h2>Eventos del Campamento</h2>
+    <h2>{{ isInCampContext ? 'Eventos del Campamento' : 'Gestión de Eventos' }}</h2>
     <div class="d-flex justify-content-between align-items-center">
-      <a routerLink="/camps" class="text-decoration-none">
+      <a *ngIf="isInCampContext" routerLink="/camps" class="text-decoration-none">
         <i class="bi bi-arrow-left"></i> Volver a Campamentos
       </a>
+      <div *ngIf="!isInCampContext"></div>
       <div class="d-flex gap-2">
         <button
+          *ngIf="isInCampContext"
           class="btn btn-info text-white"
           [routerLink]="['/camps', campId, 'ranking']"
         >
           <i class="bi bi-trophy"></i> Ver Ranking General
         </button>
         <button
+          *ngIf="isInCampContext"
           class="btn btn-success"
           [routerLink]="['/camps', campId, 'events', 'new']"
         >
           Nuevo Evento
+        </button>
+        <button
+          *ngIf="!isInCampContext"
+          class="btn btn-success"
+          routerLink="/events/new"
+        >
+          <i class="bi bi-plus-lg"></i> Nuevo Evento
         </button>
       </div>
     </div>
@@ -53,8 +63,9 @@
         <tr>
           <th>Nombre</th>
           <th>Descripción</th>
+          <th>Puntaje Máximo</th>
           <th>Planilla de Calificación</th>
-          <th>Calificar</th>
+          <th *ngIf="isInCampContext">Calificar</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -62,6 +73,7 @@
         <tr *ngFor="let event of filteredEvents">
           <td>{{ event.name }}</td>
           <td>{{ event.description }}</td>
+          <td>{{ event.maxScore }}</td>
           <td>
             <span *ngIf="event.items && event.items.length > 0">
               {{ event.items.length }} <small>Items de calificación</small>
@@ -70,7 +82,7 @@
               Sin ítems de calificación
             </span>
           </td>
-          <td>
+          <td *ngIf="isInCampContext">
             <button
               type="button"
               class="btn btn-success"
@@ -88,9 +100,18 @@
           <td>
             <div class="btn-group" role="group">
               <button
+                *ngIf="isInCampContext"
                 type="button"
                 class="btn btn-sm btn-outline-primary"
                 [routerLink]="['/camps', campId, 'events', event.id, 'edit']"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                *ngIf="!isInCampContext"
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                [routerLink]="['/events', event.id, 'edit']"
               >
                 <i class="bi bi-pencil"></i>
               </button>

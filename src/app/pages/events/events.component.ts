@@ -15,10 +15,11 @@ export class EventsComponent implements OnInit {
   events: Event[] = [];
   filteredEvents: Event[] = [];
   searchTerm = '';
-  campId: number = 0;
+  campId?: number;
   campName: string = '';
   isLoading = false;
   errorMessage = '';
+  isInCampContext = false;
 
   constructor(
     private eventService: EventService,
@@ -28,21 +29,30 @@ export class EventsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      this.campId = +params['campId']; // Convertir a número
+      const campIdParam = params['campId'];
+
+      if (campIdParam) {
+        // Estamos en contexto de campamento
+        this.campId = +campIdParam;
+        this.isInCampContext = true;
+      } else {
+        // Estamos en vista independiente
+        this.isInCampContext = false;
+      }
+
       this.loadEvents();
     });
   }
 
   loadEvents(): void {
-    if (!this.campId) {
-      this.errorMessage = 'ID de campamento no válido';
-      return;
-    }
-
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.eventService.getEventsByCampId(this.campId).subscribe({
+    const eventsObservable = this.isInCampContext && this.campId
+      ? this.eventService.getEventsByCampId(this.campId)
+      : this.eventService.getEvents();
+
+    eventsObservable.subscribe({
       next: (events) => {
         this.events = events.sort((a, b) => a.name.localeCompare(b.name));
         this.filteredEvents = [...this.events];

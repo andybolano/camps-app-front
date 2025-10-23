@@ -1,246 +1,483 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
 
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 @import '@ng-select/ng-select/scss/default.theme.scss';
 
-:root {
-    --primary-color: #1c1c27;
-    --text-color: #1c1c27;
-    --white: #ffffff;
-    --gray-100: #f8f9fa;
-    --gray-200: #e9ecef;
-    --gray-300: #dee2e6;
-    --gray-400: #ced4da;
-    --gray-500: #adb5bd;
-    --gray-600: #6c757d;
-    --gray-700: #495057;
-    --gray-800: #343a40;
-    --gray-900: #212529;
-    --border-radius: 0;
-    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
+// Import custom styles
+@import 'styles/variables';
+@import 'styles/mixins';
+@import 'styles/utilities';
+
+// Reset and Base Styles
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-html, body { 
-    height: 100%;
-    font-family: 'Onest', sans-serif;
-    color: var(--primary-color);
-    background-color: var(--gray-100);
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.bg-primary {
-    background-color: var(--primary-color) !important;
-    color: var(--white) !important;
-
-    h1, h2, h3, h4, h5, h6 {
-        color: var(--white) !important;
-    }
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: 1.5;
+  color: $text-primary;
+  background-color: $bg-secondary;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.text-primary {
-    color: var(--primary-color) !important;
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $spacing-md 0;
+  font-weight: $font-weight-semibold;
+  line-height: 1.2;
+  color: $text-primary;
 }
 
-* {
-    font-family: 'Onest', sans-serif;
-    box-sizing: border-box;
-}
-
-/* Modern Card Styles */
-.card {
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    border: none;
-    transition: var(--transition);
-    background-color: var(--white);
-}
-
-.card-header:first-child {
-    border-radius: var(--border-radius);
-}
-
-.card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Modern Button Styles */
-button, 
-.btn, 
-[type="button"], 
-[type="submit"] {
-    background-color: var(--primary-color) !important;
-    color: var(--white) !important;
-    border-color: var(--primary-color) !important;
-    border-radius: var(--border-radius);
-    padding: 0.5rem 1.5rem;
-    transition: var(--transition);
-    font-weight: 500;
-}
-
-button:hover, 
-.btn:hover, 
-[type="button"]:hover, 
-[type="submit"]:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--box-shadow);
-}
-
-/* Secondary button styles */
-.btn-secondary {
-    background-color: transparent !important;
-    color: var(--primary-color) !important;
-    border-color: transparent !important;
-}
-
-.btn-secondary:hover {
-    background-color: var(--gray-100) !important;
-}
-
-/* Form Elements */
-input, 
-textarea, 
-select {
-    border-radius: var(--border-radius);
-    border: 1px solid var(--gray-300);
-    padding: 0.75rem 1rem;
-    transition: var(--transition);
-}
-
-input:focus, 
-textarea:focus, 
-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(28, 28, 39, 0.25);
-    outline: none;
-}
-
-/* Table Styles */
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-th {
-    background-color: var(--gray-100);
-    color: var(--primary-color);
-    font-weight: 600;
-    padding: 1rem;
-    text-align: left;
-}
-
-td {
-    padding: 1rem;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-tr:hover {
-    background-color: var(--gray-100);
-}
-
-/* Badge Styles */
-.badge {
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    font-weight: 500;
-}
-
-/* Icon styles within buttons */
-button i,
-.btn i,
-[type="button"] i,
-[type="submit"] i,
-button .bi,
-.btn .bi,
-[type="button"] .bi,
-[type="submit"] .bi,
-button mat-icon,
-.btn mat-icon,
-[type="button"] mat-icon,
-[type="submit"] mat-icon {
-    color: var(--white) !important;
-}
-
-/* Secondary button icon styles */
-.btn-secondary i,
-.btn-secondary .bi,
-.btn-secondary mat-icon {
-    color: var(--primary-color) !important;
-}
-
-/* Override ng-select styles */
-.ng-select {
-    border-radius: var(--border-radius);
-}
-
-.ng-select .ng-select-container {
-    color: var(--primary-color) !important;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--gray-300);
-}
-
-.ng-select.ng-select-focused .ng-select-container {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(28, 28, 39, 0.25);
-}
-
-/* Typography */
-h1, h2, h3, h4, h6 {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.75rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
+h1 { font-size: $font-size-4xl; }
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+h4 { font-size: $font-size-xl; }
+h5 { font-size: $font-size-lg; }
+h6 { font-size: $font-size-base; }
 
 p {
-    line-height: 1.6;
-    margin-bottom: 1rem;
+  margin: 0 0 $spacing-md 0;
+  line-height: 1.6;
 }
 
-/* Material Design Overrides */
-.mat-button, 
-.mat-raised-button, 
-.mat-stroked-button, 
-.mat-flat-button {
-    background-color: var(--primary-color) !important;
-    color: var(--white) !important;
-    border-color: var(--primary-color) !important;
-    border-radius: var(--border-radius) !important;
+a {
+  color: $accent-color;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: darken($accent-color, 10%);
+  }
 }
 
-.mat-button:hover, 
-.mat-raised-button:hover, 
-.mat-stroked-button:hover, 
-.mat-flat-button:hover {
+// Button Styles
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 1.5;
+  border-radius: $border-radius-md;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: var(--box-shadow);
+    box-shadow: $shadow-md;
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
 }
 
-/* Utility Classes */
-.text-white {
-    color: var(--white) !important;
+.btn-primary {
+  background-color: $primary-color;
+  color: $white;
+  border-color: $primary-color;
+
+  &:hover:not(:disabled) {
+    background-color: lighten($primary-color, 10%);
+    border-color: lighten($primary-color, 10%);
+  }
 }
 
-.shadow-sm {
-    box-shadow: var(--box-shadow);
+.btn-secondary {
+  background-color: transparent;
+  color: $text-primary;
+  border-color: $border-color;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-secondary;
+  }
 }
 
-.rounded {
-    border-radius: var(--border-radius);
+.btn-success {
+  background-color: $success-color;
+  color: $white;
+  border-color: $success-color;
+
+  &:hover:not(:disabled) {
+    background-color: darken($success-color, 10%);
+  }
 }
 
-.transition {
-    transition: var(--transition);
+.btn-danger {
+  background-color: $danger-color;
+  color: $white;
+  border-color: $danger-color;
+
+  &:hover:not(:disabled) {
+    background-color: darken($danger-color, 10%);
+  }
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: $primary-color;
+  border-color: $primary-color;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-color;
+    color: $white;
+  }
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: $text-secondary;
+  border-color: $gray-300;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-100;
+    border-color: $gray-400;
+  }
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: $danger-color;
+  border-color: $danger-color;
+
+  &:hover:not(:disabled) {
+    background-color: $danger-color;
+    color: $white;
+  }
+}
+
+.btn-sm {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-xs;
+}
+
+.btn-lg {
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-size-lg;
 }
 
 .btn-group {
-    gap: 4px;
+  display: inline-flex;
+  gap: $spacing-xs;
+}
+
+// Form Styles
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  display: block;
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-family: $font-family-base;
+  line-height: 1.5;
+  color: $text-primary;
+  background-color: $bg-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  &:disabled {
+    background-color: $bg-secondary;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.form-label {
+  display: block;
+  margin-bottom: $spacing-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.form-text {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.form-group {
+  margin-bottom: $spacing-lg;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-base;
+    background-color: $bg-secondary;
+    border: 1px solid $border-color;
+    border-right: none;
+    border-radius: $border-radius-md 0 0 $border-radius-md;
+  }
+
+  .form-control {
+    border-left: none;
+    border-radius: 0 $border-radius-md $border-radius-md 0;
+  }
+}
+
+// Card Styles
+.card {
+  @include card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.card-header {
+  margin: (-$spacing-lg) (-$spacing-lg) $spacing-lg (-$spacing-lg);
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.card-footer {
+  margin: $spacing-lg (-$spacing-lg) (-$spacing-lg) (-$spacing-lg);
+  padding: $spacing-lg;
+  border-top: 1px solid $border-color;
+  background-color: $bg-secondary;
+}
+
+// Table Styles
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $bg-primary;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+  thead {
+    background-color: $bg-secondary;
+
+    th {
+      padding: $spacing-md;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      text-align: left;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid $border-color;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color $transition-fast;
+      border-bottom: 1px solid $border-color;
+
+      &:hover {
+        background-color: $bg-secondary;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: $spacing-md;
+      font-size: $font-size-sm;
+      color: $text-primary;
+    }
+  }
+}
+
+.table-striped {
+  tbody tr:nth-child(odd) {
+    background-color: $bg-secondary;
+  }
+}
+
+// Alert Styles
+.alert {
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius-md;
+  border: 1px solid transparent;
+  margin-bottom: $spacing-lg;
+
+  &.alert-success {
+    background-color: lighten($success-color, 40%);
+    color: darken($success-color, 20%);
+    border-color: lighten($success-color, 30%);
+  }
+
+  &.alert-danger {
+    background-color: lighten($danger-color, 40%);
+    color: darken($danger-color, 20%);
+    border-color: lighten($danger-color, 30%);
+  }
+
+  &.alert-warning {
+    background-color: lighten($warning-color, 40%);
+    color: darken($warning-color, 30%);
+    border-color: lighten($warning-color, 30%);
+  }
+
+  &.alert-info {
+    background-color: lighten($info-color, 40%);
+    color: darken($info-color, 20%);
+    border-color: lighten($info-color, 30%);
+  }
+}
+
+// Badge Styles
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+}
+
+// Modal Styles
+.modal {
+  .modal-dialog {
+    max-width: 500px;
+    margin: 1.75rem auto;
+  }
+
+  .modal-content {
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-xl;
+    border: none;
+  }
+
+  .modal-header {
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .modal-body {
+    padding: $spacing-lg;
+  }
+
+  .modal-footer {
+    padding: $spacing-lg;
+    border-top: 1px solid $border-color;
+    background-color: $bg-secondary;
+  }
+}
+
+// Spinner
+.spinner-border {
+  border: 3px solid rgba($primary-color, 0.1);
+  border-left-color: $primary-color;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $gray-400;
+  border-radius: 4px;
+
+  &:hover {
+    background: $gray-500;
+  }
+}
+
+// ng-select override
+.ng-select {
+  .ng-select-container {
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md;
+    min-height: 42px;
+
+    &:hover {
+      border-color: $gray-400;
+    }
+  }
+
+  &.ng-select-focused {
+    .ng-select-container {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+  }
+}
+
+// Container
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
 }

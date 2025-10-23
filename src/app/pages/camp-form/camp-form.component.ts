@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CampService, CreateCampDto } from '../../services/camp.service';
+import { Category, CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-camp-form',
@@ -25,16 +26,20 @@ export class CampFormComponent implements OnInit {
   logoFile?: File;
   logoPreview?: string;
   currentLogo?: string;
+  categories: Category[] = [];
+  loadingCategories = false;
 
   constructor(
     private fb: FormBuilder,
     private campService: CampService,
+    private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.loadCategories();
 
     // Verificar si estamos en modo edición
     this.route.paramMap.subscribe((params) => {
@@ -53,7 +58,22 @@ export class CampFormComponent implements OnInit {
       location: ['', [Validators.required]],
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required]],
+      targetCategoryId: ['', [Validators.required]],
       description: [''],
+    });
+  }
+
+  loadCategories(): void {
+    this.loadingCategories = true;
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories.filter(c => c.isActive);
+        this.loadingCategories = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Error al cargar las categorías: ' + error.message;
+        this.loadingCategories = false;
+      },
     });
   }
 
@@ -69,11 +89,15 @@ export class CampFormComponent implements OnInit {
           ? new Date(camp.endDate).toISOString().split('T')[0]
           : '';
 
-        this.campForm.setValue({
+        // Extraer el targetCategoryId del objeto targetCategory o usar el campo directo
+        const targetCategoryId = camp.targetCategory?.id || camp.targetCategoryId || '';
+
+        this.campForm.patchValue({
           name: camp.name,
           location: camp.location,
           startDate: startDate,
           endDate: endDate,
+          targetCategoryId: targetCategoryId,
           description: camp.description || '',
         });
 
@@ -167,6 +191,9 @@ export class CampFormComponent implements OnInit {
   }
   get endDate() {
     return this.campForm.get('endDate');
+  }
+  get targetCategoryId() {
+    return this.campForm.get('targetCategoryId');
   }
   get description() {
     return this.campForm.get('description');

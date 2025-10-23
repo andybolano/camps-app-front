@@ -5,10 +5,12 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormArray,
+  FormControl,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ClubService, CreateClubDto } from '../../services/club.service';
-import { CampService } from '../../services/camp.service';
+import { ClubService, CreateClubDto, UpdateClubDto } from '../../services/club.service';
+import { CategoryService, Category } from '../../services/category.service';
 
 @Component({
   selector: 'app-club-form',
@@ -21,69 +23,52 @@ export class ClubFormComponent implements OnInit {
   clubForm!: FormGroup;
   isEditMode = false;
   clubId?: number;
-  campId!: number;
-  campName = 'Cargando...';
   isLoading = false;
   errorMessage = '';
   shieldFile?: File;
   shieldPreview?: string;
   currentShield?: string;
-  debug = true; // Habilitar mensajes de depuración
+  categories: Category[] = [];
 
   constructor(
     private fb: FormBuilder,
     private clubService: ClubService,
-    private campService: CampService,
+    private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.loadCategories();
 
-    // Obtener campId
     this.route.paramMap.subscribe((params) => {
-      const campId = params.get('campId');
-      if (campId) {
-        this.campId = +campId;
-        this.loadCampData(this.campId);
-
-        // Verificar si estamos en modo edición
-        const id = params.get('id');
-        if (id) {
-          this.isEditMode = true;
-          this.clubId = +id;
-          this.loadClubData(this.clubId);
-        }
+      const id = params.get('id');
+      if (id) {
+        this.isEditMode = true;
+        this.clubId = +id;
+        this.loadClubData(this.clubId);
       }
     });
   }
 
   initForm(): void {
     this.clubForm = this.fb.group({
-      name: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
       city: ['', [Validators.required]],
-      participantsCount: [0, [Validators.required, Validators.min(0)]],
-      guestsCount: [0, [Validators.required, Validators.min(0)]],
-      minorsCount: [0, [Validators.required, Validators.min(0)]],
-      economsCount: [0, [Validators.required, Validators.min(0)]],
-      companionsCount: [0, [Validators.required, Validators.min(0)]],
-      directorCount: [0, [Validators.required, Validators.min(0)]],
-      pastorCount: [0, [Validators.required, Validators.min(0)]],
-      registrationFee: [0, [Validators.required, Validators.min(0)]],
-      isPaid: [false],
+      motto: ['', [Validators.required, Validators.minLength(5)]],
+      categoryIds: this.fb.array([]),
     });
   }
 
-  loadCampData(campId: number): void {
-    this.campService.getCamp(campId).subscribe({
-      next: (camp) => {
-        this.campName = camp.name;
+  loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories.filter(c => c.isActive);
       },
       error: (error) => {
-        this.errorMessage =
-          'Error al cargar los datos del campamento: ' + error.message;
-      },
+        console.error('Error al cargar categorías:', error);
+      }
     });
   }
 
@@ -91,31 +76,28 @@ export class ClubFormComponent implements OnInit {
     this.isLoading = true;
     this.clubService.getClub(id).subscribe({
       next: (club) => {
-        this.clubForm.setValue({
+        this.clubForm.patchValue({
           name: club.name,
           city: club.city,
-          participantsCount: club.participantsCount,
-          guestsCount: club.guestsCount,
-          minorsCount: club.minorsCount || 0,
-          economsCount: club.economsCount,
-          companionsCount: club.companionsCount || 0,
-          directorCount: club.directorCount || 0,
-          pastorCount: club.pastorCount || 0,
-          registrationFee: club.registrationFee,
-          isPaid: club.isPaid,
+          motto: club.motto,
         });
 
-        // Guardar la URL del escudo actual si existe
+        // Cargar las categorías seleccionadas
+        const categoryIds = club.clubCategories.map(cc => cc.category.id);
+        const categoryIdsArray = this.clubForm.get('categoryIds') as FormArray;
+        categoryIdsArray.clear();
+        categoryIds.forEach(id => {
+          categoryIdsArray.push(new FormControl(id));
+        });
+
         if (club.shieldUrl) {
           this.currentShield = club.shieldUrl;
-          console.log('URL del escudo cargada:', this.currentShield);
         }
 
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage =
-          'Error al cargar los datos del club: ' + error.message;
+        this.errorMessage = 'Error al cargar los datos del club: ' + error.message;
         this.isLoading = false;
       },
     });
@@ -142,31 +124,63 @@ export class ClubFormComponent implements OnInit {
     }
   }
 
+  get categoryIdsArray(): FormArray {
+    return this.clubForm.get('categoryIds') as FormArray;
+  }
+
+  isCategorySelected(categoryId: number): boolean {
+    return this.categoryIdsArray.value.includes(categoryId);
+  }
+
+  onCategoryChange(categoryId: number, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const categoryIdsArray = this.categoryIdsArray;
+
+    if (checkbox.checked) {
+      // Agregar categoría
+      if (!categoryIdsArray.value.includes(categoryId)) {
+        categoryIdsArray.push(new FormControl(categoryId));
+      }
+    } else {
+      // Remover categoría
+      const index = categoryIdsArray.value.indexOf(categoryId);
+      if (index >= 0) {
+        categoryIdsArray.removeAt(index);
+      }
+    }
+  }
+
   onSubmit(): void {
     if (this.clubForm.invalid) {
+      Object.keys(this.clubForm.controls).forEach(key => {
+        const control = this.clubForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const formData: CreateClubDto = {
-      ...this.clubForm.value,
-      campId: this.campId,
-    };
-
-    console.log('Form isPaid value:', this.clubForm.get('isPaid')?.value);
-    console.log('Form data to submit:', formData);
+    const formValue = this.clubForm.value;
 
     if (this.isEditMode && this.clubId) {
       // Actualizar club existente
+      const updateData: UpdateClubDto = {
+        name: formValue.name,
+        city: formValue.city,
+        motto: formValue.motto,
+        categoryIds: formValue.categoryIds || []
+      };
+
       this.clubService
-        .updateClub(this.clubId, formData, this.shieldFile)
+        .updateClub(this.clubId, updateData, this.shieldFile)
         .subscribe({
-          next: (updatedClub) => {
-            console.log('Club actualizado con isPaid:', updatedClub.isPaid);
+          next: () => {
             this.isLoading = false;
-            this.router.navigate(['/camps', this.campId, 'clubs']);
+            this.router.navigate(['/clubs']);
           },
           error: (error) => {
             this.errorMessage = 'Error al actualizar el club: ' + error.message;
@@ -175,11 +189,17 @@ export class ClubFormComponent implements OnInit {
         });
     } else {
       // Crear nuevo club
-      this.clubService.createClub(formData, this.shieldFile).subscribe({
-        next: (newClub) => {
-          console.log('Club creado con isPaid:', newClub.isPaid);
+      const createData: CreateClubDto = {
+        name: formValue.name,
+        city: formValue.city,
+        motto: formValue.motto,
+        categoryIds: formValue.categoryIds || []
+      };
+
+      this.clubService.createClub(createData, this.shieldFile).subscribe({
+        next: () => {
           this.isLoading = false;
-          this.router.navigate(['/camps', this.campId, 'clubs']);
+          this.router.navigate(['/clubs']);
         },
         error: (error) => {
           this.errorMessage = 'Error al crear el club: ' + error.message;
@@ -189,11 +209,6 @@ export class ClubFormComponent implements OnInit {
     }
   }
 
-  onIsPaidChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    console.log('isPaid checkbox changed:', target.checked);
-  }
-
   // Getters para facilitar el acceso en la plantilla
   get name() {
     return this.clubForm.get('name');
@@ -201,31 +216,7 @@ export class ClubFormComponent implements OnInit {
   get city() {
     return this.clubForm.get('city');
   }
-  get participantsCount() {
-    return this.clubForm.get('participantsCount');
-  }
-  get guestsCount() {
-    return this.clubForm.get('guestsCount');
-  }
-  get minorsCount() {
-    return this.clubForm.get('minorsCount');
-  }
-  get economsCount() {
-    return this.clubForm.get('economsCount');
-  }
-  get companionsCount() {
-    return this.clubForm.get('companionsCount');
-  }
-  get directorCount() {
-    return this.clubForm.get('directorCount');
-  }
-  get pastorCount() {
-    return this.clubForm.get('pastorCount');
-  }
-  get registrationFee() {
-    return this.clubForm.get('registrationFee');
-  }
-  get isPaid() {
-    return this.clubForm.get('isPaid');
+  get motto() {
+    return this.clubForm.get('motto');
   }
 }

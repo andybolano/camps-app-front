@@ -11,6 +11,13 @@ export interface Camp {
   endDate: string;
   description?: string;
   logoUrl?: string;
+  targetCategoryId: number;
+  targetCategory?: {
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+  };
   clubs?: any[]; // Información de clubes relacionados
   events?: any[]; // Información de eventos relacionados
 }
@@ -20,6 +27,7 @@ export interface CreateCampDto {
   location: string;
   startDate: string;
   endDate: string;
+  targetCategoryId: number;
   description?: string;
   logoUrl?: string;
 }
@@ -62,6 +70,7 @@ export class CampService {
     formData.append('location', camp.location);
     formData.append('startDate', camp.startDate);
     formData.append('endDate', camp.endDate);
+    formData.append('targetCategoryId', camp.targetCategoryId.toString());
 
     if (camp.description) {
       formData.append('description', camp.description);
@@ -90,6 +99,8 @@ export class CampService {
     if (camp.startDate !== undefined)
       formData.append('startDate', camp.startDate);
     if (camp.endDate !== undefined) formData.append('endDate', camp.endDate);
+    if (camp.targetCategoryId !== undefined)
+      formData.append('targetCategoryId', camp.targetCategoryId.toString());
     if (camp.description !== undefined)
       formData.append('description', camp.description);
 

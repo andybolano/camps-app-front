@@ -1,23 +1,221 @@
-.club-shield, .club-no-shield {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50px;
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.clubs-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+// Page Header
+.page-header {
+  margin-bottom: $spacing-xl;
+
+  .header-content {
+    @include flex-between;
+    gap: $spacing-lg;
+    flex-wrap: wrap;
+
+    h1 {
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      margin-bottom: $spacing-sm;
+      font-size: $font-size-base;
+    }
+  }
+
+  .back-link {
+    @include flex-start;
+    gap: $spacing-xs;
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color $transition-base;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+// Search Section
+.search-section {
+  margin-bottom: $spacing-lg;
+
+  .input-group {
+    max-width: 500px;
+  }
+}
+
+// Loading Container
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-secondary;
+}
+
+// Table Container
+.table-container {
+  background: $bg-primary;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+  .table {
+    margin-bottom: 0;
+
+    thead th {
+      white-space: nowrap;
+    }
+
+    .actions-column {
+      text-align: center;
+      width: 140px;
+    }
+
+    .font-weight-semibold {
+      font-weight: $font-weight-semibold;
+    }
+
+    .motto-cell {
+      max-width: 300px;
+      @include text-line-clamp(2);
+    }
+
+    .categories-cell {
+      @include flex-start;
+      gap: $spacing-xs;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+// Club Shield
+.club-shield-wrapper {
+  @include flex-center;
+}
+
+.club-shield {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background: $bg-secondary;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .club-no-shield {
-  color: #adb5bd;
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $border-radius-md;
+  background: $bg-secondary;
+  color: $text-tertiary;
+
+  i {
+    font-size: $font-size-2xl;
+  }
 }
 
-.table th {
-  vertical-align: middle;
+// Status Badge
+.status-badge {
+  @include flex-start;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  display: inline-flex;
+
+  &.paid {
+    background-color: lighten($success-color, 45%);
+    color: darken($success-color, 10%);
+
+    i {
+      color: $success-color;
+    }
+  }
+
+  &.unpaid {
+    background-color: lighten($warning-color, 45%);
+    color: darken($warning-color, 20%);
+
+    i {
+      color: $warning-color;
+    }
+  }
 }
 
-.table td {
-  vertical-align: middle;
+// Action Buttons
+.action-buttons {
+  @include flex-center;
+  gap: $spacing-xs;
 }
 
-// Añadir espacio entre botones del grupo
-.btn-group .btn {
-  margin-right: 3px;
+// Empty State
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-3xl;
+  text-align: center;
+  background: $bg-primary;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+
+  i {
+    font-size: 64px;
+    color: $text-tertiary;
+    margin-bottom: $spacing-lg;
+  }
+
+  h3 {
+    margin-bottom: $spacing-sm;
+    color: $text-primary;
+  }
+
+  p {
+    color: $text-secondary;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+// Responsive
+@include mobile {
+  .page-header {
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+
+      > button {
+        width: 100%;
+      }
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+
+    .table {
+      min-width: 900px;
+    }
+  }
+}
+
+@include tablet {
+  .table-container {
+    overflow-x: auto;
+
+    .table {
+      min-width: 800px;
+    }
+  }
 }

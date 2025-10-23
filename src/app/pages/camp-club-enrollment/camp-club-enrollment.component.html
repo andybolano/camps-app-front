@@ -1,0 +1,142 @@
+<div class="enrollment-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <a [routerLink]="['/camps', campId, 'clubs']" class="back-link">
+          <i class="bi bi-arrow-left"></i> Volver a Clubes
+        </a>
+        <h1>Inscribir Clubes al Campamento</h1>
+        <p class="text-secondary" *ngIf="camp">
+          {{ camp.name }} - {{ camp.targetCategory?.name }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando clubes disponibles...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ successMessage }}
+  </div>
+
+  <!-- Selection Controls -->
+  <div *ngIf="!isLoading && clubs.length > 0" class="selection-controls card mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <strong>{{ selectedCount }}</strong> club(es) seleccionado(s)
+      </div>
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          (click)="selectAll()"
+          [disabled]="isEnrolling"
+        >
+          Seleccionar Todos
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          (click)="deselectAll()"
+          [disabled]="isEnrolling"
+        >
+          Deseleccionar Todos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clubs List -->
+  <div *ngIf="!isLoading && clubs.length > 0" class="clubs-list">
+    <div
+      *ngFor="let club of clubs"
+      class="club-card card mb-3"
+      [class.selected]="isClubSelected(club.id)"
+    >
+      <div class="card-body">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="'club-' + club.id"
+            [checked]="isClubSelected(club.id)"
+            (change)="toggleClubSelection(club.id)"
+            [disabled]="isEnrolling"
+          >
+          <label class="form-check-label d-flex align-items-center w-100" [for]="'club-' + club.id">
+            <div class="club-shield-small me-3">
+              <div *ngIf="club.shieldUrl" class="shield-image">
+                <img
+                  [src]="club.shieldUrl"
+                  [alt]="'Escudo ' + club.name"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div class="shield-placeholder" style="display: none;">
+                  <i class="bi bi-shield"></i>
+                </div>
+              </div>
+              <div *ngIf="!club.shieldUrl" class="shield-placeholder">
+                <i class="bi bi-shield"></i>
+              </div>
+            </div>
+            <div class="club-info flex-grow-1">
+              <h5 class="mb-1">{{ club.name }}</h5>
+              <div class="text-muted">
+                <i class="bi bi-geo-alt"></i> {{ club.city }}
+              </div>
+              <div class="text-muted small">
+                <i class="bi bi-quote"></i> {{ club.motto }}
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && clubs.length === 0" class="empty-state">
+    <i class="bi bi-inbox"></i>
+    <h3>No hay clubes disponibles</h3>
+    <p>No se encontraron clubes con la categoría {{ camp?.targetCategory?.name }} para inscribir en este campamento.</p>
+  </div>
+
+  <!-- Action Buttons -->
+  <div *ngIf="!isLoading && clubs.length > 0" class="action-buttons card mt-4">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        [routerLink]="['/camps', campId, 'clubs']"
+        [disabled]="isEnrolling"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="enrollSelectedClubs()"
+        [disabled]="selectedCount === 0 || isEnrolling"
+      >
+        <span *ngIf="isEnrolling" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!isEnrolling" class="bi bi-check-circle me-2"></i>
+        {{ isEnrolling ? 'Inscribiendo...' : 'Inscribir ' + selectedCount + ' Club(es)' }}
+      </button>
+    </div>
+  </div>
+</div>

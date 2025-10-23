@@ -1,144 +1,211 @@
-.card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  border: none;
-  
-  .card-header {
-    border-radius: 8px 8px 0 0;
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.club-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  margin-bottom: $spacing-xl;
+
+  .back-link {
+    @include flex-start;
+    gap: $spacing-xs;
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color $transition-base;
+
+    &:hover {
+      color: $primary-color;
+    }
   }
 }
 
-.list-group-item {
+// Loading Container
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-secondary;
+}
+
+// Club Info
+.club-info {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  strong {
-    color: #495057;
+  flex-direction: column;
+  gap: $spacing-xl;
+}
+
+// Club Header
+.club-header {
+  .club-header-content {
+    @include flex-start;
+    gap: $spacing-xl;
+    flex-wrap: wrap;
   }
 }
 
-.badge {
-  font-size: 0.9rem;
-  padding: 0.35em 0.65em;
-}
+.club-shield-large {
+  flex-shrink: 0;
 
-.img-thumbnail {
-  border: 2px solid #dee2e6;
-  padding: 3px;
-}
-
-// Estilos para el modal
-.modal {
-  .modal-header {
-    border-bottom: 0;
-  }
-  
-  .modal-body {
-    padding: 1.5rem;
-  }
-  
-  .display-6 {
-    font-size: 2rem;
-  }
-  
-  .table {
-    th {
-      background-color: #f8f9fa;
+  .shield-image {
+    img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: $border-radius-lg;
+      border: 2px solid $border-color;
     }
-    
-    tfoot {
-      font-size: 1.1rem;
+  }
+
+  .shield-placeholder {
+    @include flex-center;
+    width: 120px;
+    height: 120px;
+    background: $bg-secondary;
+    border-radius: $border-radius-lg;
+    border: 2px dashed $border-color;
+    color: $text-tertiary;
+
+    i {
+      font-size: 48px;
     }
   }
 }
 
-// Estilos para impresión
-@media print {
-  @page {
-    margin: 0;
-    size: A4;
-    margin-top: 0;
-    margin-bottom: 0;
+.club-title {
+  flex: 1;
+  min-width: 300px;
+
+  h1 {
+    margin-bottom: $spacing-sm;
   }
-  
-  body * {
-    visibility: hidden;
+
+  .motto {
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    font-style: italic;
+    margin-bottom: $spacing-md;
   }
-  
-  .d-print-block,
-  .d-print-block * {
-    visibility: visible;
+
+  .club-meta {
+    @include flex-start;
+    gap: $spacing-lg;
+    flex-wrap: wrap;
   }
-  
-  .d-print-block {
-    position: absolute;
-    left: 0;
-    top: 0;
+
+  .meta-item {
+    @include flex-start;
+    gap: $spacing-xs;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+
+    i {
+      color: $text-tertiary;
+    }
+  }
+}
+
+.club-actions {
+  margin-left: auto;
+}
+
+// Categories Section
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.category-item {
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border-radius: $border-radius-md;
+  border-left: 4px solid $primary-color;
+}
+
+.category-badge {
+  @include flex-start;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+
+  .category-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: $primary-color;
+    color: $white;
+    border-radius: $border-radius-sm;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-sm;
+  }
+
+  .category-name {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+}
+
+.category-description {
+  margin: 0;
+  padding-left: 48px;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+// Info Grid
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .info-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  .info-value {
+    font-size: $font-size-base;
+    color: $text-primary;
+  }
+}
+
+// Responsive
+@include mobile {
+  .club-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .club-actions {
+    margin-left: 0;
     width: 100%;
-    padding: 2cm;
-  }
 
-  // Estilos para la tabla de impresión
-  .d-print-block {
-    h4 {
-      font-size: 24px;
-      margin-bottom: 1rem;
-      color: #000;
-    }
-    
-    h5 {
-      font-size: 18px;
-      margin-bottom: 2rem;
-      color: #333;
-    }
-    
-    .table {
+    button {
       width: 100%;
-      border-collapse: collapse;
-      
-      th {
-        background-color: #f8f9fa;
-        padding: 0.75rem;
-        border: 1px solid #dee2e6;
-        font-weight: bold;
-        text-align: left;
-      }
-      
-      td {
-        padding: 0.75rem;
-        border: 1px solid #dee2e6;
-      }
-      
-      .text-end {
-        text-align: right;
-      }
-      
-      .text-center {
-        text-align: center;
-      }
-    }
-    
-    .table-sm {
-      th, td {
-        padding: 0.3rem;
-      }
     }
   }
 
-  // Ocultar elementos del navegador
-  ::ng-deep {
-    .navbar,
-    .breadcrumb,
-    .page-header,
-    .page-footer,
-    .page-title,
-    .page-url,
-    header,
-    footer,
-    .header,
-    .footer {
-      display: none !important;
-    }
+  .category-badge {
+    flex-direction: column;
+    align-items: flex-start;
   }
-} 
+
+  .category-description {
+    padding-left: 0;
+  }
+}

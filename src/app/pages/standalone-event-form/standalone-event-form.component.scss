@@ -1,0 +1,49 @@
+.event-form-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: #6c757d;
+    text-decoration: none;
+    margin-bottom: 1rem;
+
+    &:hover {
+      color: #495057;
+    }
+  }
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.items-section {
+  h3 {
+    margin: 0;
+  }
+}
+
+.item-card {
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.action-buttons {
+  padding-top: 2rem;
+  border-top: 1px solid #dee2e6;
+}

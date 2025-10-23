@@ -1,0 +1,50 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="bi bi-trophy"></i>
+        <span class="logo-text" *ngIf="!sidebarCollapsed">Campamentos</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/camps" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-calendar-event"></i>
+        <span class="nav-text" *ngIf="!sidebarCollapsed">Gestión de Campamentos</span>
+      </a>
+      <a routerLink="/clubs" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-people"></i>
+        <span class="nav-text" *ngIf="!sidebarCollapsed">Gestión de Clubes</span>
+      </a>
+      <a routerLink="/events" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-star"></i>
+        <span class="nav-text" *ngIf="!sidebarCollapsed">Gestión de Eventos</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <div class="navbar-content">
+        <div class="navbar-end">
+          <button class="btn-icon" (click)="logout($event)" title="Cerrar Sesión">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="logout-text">Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

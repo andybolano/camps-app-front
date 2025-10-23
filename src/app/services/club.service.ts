@@ -3,49 +3,44 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface MemberCharacteristic {
-  id?: number;
+export interface Category {
+  id: number;
   name: string;
-  value: number;
-  matchCount?: number;
+  description: string;
+  code: string;
+  isActive: boolean;
+}
+
+export interface ClubCategory {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  category: Category;
 }
 
 export interface Club {
   id: number;
   name: string;
   city: string;
-  participantsCount: number;
-  guestsCount: number;
-  minorsCount: number;
-  economsCount: number;
-  companionsCount: number;
-  directorCount: number;
-  pastorCount: number;
-  registrationFee: number;
-  isPaid: boolean;
-  shieldUrl?: string;
-  camp: {
-    id: number;
-    name: string;
-  };
-  memberCharacteristics?: MemberCharacteristic[];
+  motto: string;
+  shieldUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  clubCategories: ClubCategory[];
 }
 
 export interface CreateClubDto {
   name: string;
   city: string;
-  participantsCount: number;
-  guestsCount: number;
-  minorsCount: number;
-  economsCount: number;
-  companionsCount: number;
-  directorCount: number;
-  pastorCount: number;
-  registrationFee: number;
-  isPaid?: boolean;
-  shieldUrl?: string;
-  campId: number;
-  memberCharacteristics?: Omit<MemberCharacteristic, 'id'>[];
+  motto: string;
+  categoryIds?: number[];
+}
+
+export interface UpdateClubDto {
+  name?: string;
+  city?: string;
+  motto?: string;
+  categoryIds?: number[];
 }
 
 @Injectable({
@@ -72,91 +67,82 @@ export class ClubService {
       .pipe(map((clubs) => clubs.map((club) => this.processShieldUrl(club))));
   }
 
-  getClubsByCamp(campId: number): Observable<Club[]> {
-    return this.http
-      .get<Club[]>(`${this.apiUrl}?campId=${campId}`)
-      .pipe(map((clubs) => clubs.map((club) => this.processShieldUrl(club))));
-  }
-
   getClub(id: number): Observable<Club> {
     return this.http
       .get<Club>(`${this.apiUrl}/${id}`)
       .pipe(map((club) => this.processShieldUrl(club)));
   }
 
-  createClub(club: CreateClubDto, shield?: File): Observable<Club> {
-    const formData = new FormData();
-
-    // Agregar los campos del formulario
-    formData.append('name', club.name);
-    formData.append('city', club.city);
-    formData.append('participantsCount', club.participantsCount.toString());
-    formData.append('guestsCount', club.guestsCount.toString());
-    formData.append('minorsCount', club.minorsCount.toString());
-    formData.append('economsCount', club.economsCount.toString());
-    formData.append('companionsCount', club.companionsCount.toString());
-    formData.append('directorCount', club.directorCount.toString());
-    formData.append('pastorCount', club.pastorCount.toString());
-    formData.append('registrationFee', club.registrationFee.toString());
-    formData.append('campId', club.campId.toString());
-
-    if (club.isPaid !== undefined) {
-      formData.append('isPaid', club.isPaid ? '1' : '0');
-    }
-
-    console.log('Creating club with isPaid:', club.isPaid);
-
-    // Agregar el escudo si existe
-    if (shield) {
-      formData.append('shield', shield);
-    }
-
+  getClubsByCategory(categoryId: number): Observable<Club[]> {
     return this.http
-      .post<Club>(this.apiUrl, formData)
-      .pipe(map((club) => this.processShieldUrl(club)));
+      .get<Club[]>(`${this.apiUrl}/by-category/${categoryId}`)
+      .pipe(map((clubs) => clubs.map((club) => this.processShieldUrl(club))));
   }
 
-  updateClub(
-    id: number,
-    club: Partial<CreateClubDto>,
-    shield?: File
-  ): Observable<Club> {
-    const formData = new FormData();
+  createClub(clubDto: CreateClubDto, shield?: File): Observable<Club> {
+    // Siempre usar FormData cuando hay shield o categoryIds
+    if (shield || (clubDto.categoryIds && clubDto.categoryIds.length > 0)) {
+      const formData = new FormData();
+      formData.append('name', clubDto.name);
+      formData.append('city', clubDto.city);
+      formData.append('motto', clubDto.motto);
 
-    // Agregar solo los campos que están presentes
-    if (club.name !== undefined) formData.append('name', club.name);
-    if (club.city !== undefined) formData.append('city', club.city);
-    if (club.participantsCount !== undefined)
-      formData.append('participantsCount', club.participantsCount.toString());
-    if (club.guestsCount !== undefined)
-      formData.append('guestsCount', club.guestsCount.toString());
-    if (club.minorsCount !== undefined)
-      formData.append('minorsCount', club.minorsCount.toString());
-    if (club.economsCount !== undefined)
-      formData.append('economsCount', club.economsCount.toString());
-    if (club.companionsCount !== undefined)
-      formData.append('companionsCount', club.companionsCount.toString());
-    if (club.directorCount !== undefined)
-      formData.append('directorCount', club.directorCount.toString());
-    if (club.pastorCount !== undefined)
-      formData.append('pastorCount', club.pastorCount.toString());
-    if (club.registrationFee !== undefined)
-      formData.append('registrationFee', club.registrationFee.toString());
-    if (club.isPaid !== undefined)
-      formData.append('isPaid', club.isPaid ? '1' : '0');
-    if (club.campId !== undefined)
-      formData.append('campId', club.campId.toString());
+      // Agregar categoryIds si existen
+      if (clubDto.categoryIds && clubDto.categoryIds.length > 0) {
+        clubDto.categoryIds.forEach(id => {
+          formData.append('categoryIds[]', id.toString());
+        });
+      }
 
-    // Agregar el escudo si existe
-    if (shield) {
-      formData.append('shield', shield);
+      // Agregar shield si existe
+      if (shield) {
+        formData.append('shield', shield);
+      }
+
+      return this.http
+        .post<Club>(this.apiUrl, formData)
+        .pipe(map((club) => this.processShieldUrl(club)));
+    } else {
+      // Sin escudo ni categorías - usar JSON
+      return this.http
+        .post<Club>(this.apiUrl, clubDto, {
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .pipe(map((club) => this.processShieldUrl(club)));
     }
+  }
 
-    console.log('Updating club with isPaid:', club.isPaid);
+  updateClub(id: number, clubDto: UpdateClubDto, shield?: File): Observable<Club> {
+    // Usar FormData cuando hay shield o categoryIds
+    if (shield || (clubDto.categoryIds && clubDto.categoryIds.length > 0)) {
+      const formData = new FormData();
+      if (clubDto.name !== undefined) formData.append('name', clubDto.name);
+      if (clubDto.city !== undefined) formData.append('city', clubDto.city);
+      if (clubDto.motto !== undefined) formData.append('motto', clubDto.motto);
 
-    return this.http
-      .patch<Club>(`${this.apiUrl}/${id}`, formData)
-      .pipe(map((club) => this.processShieldUrl(club)));
+      // Agregar categoryIds si existen
+      if (clubDto.categoryIds && clubDto.categoryIds.length > 0) {
+        clubDto.categoryIds.forEach(id => {
+          formData.append('categoryIds[]', id.toString());
+        });
+      }
+
+      // Agregar shield si existe
+      if (shield) {
+        formData.append('shield', shield);
+      }
+
+      return this.http
+        .patch<Club>(`${this.apiUrl}/${id}`, formData)
+        .pipe(map((club) => this.processShieldUrl(club)));
+    } else {
+      // Sin escudo ni categorías - usar JSON
+      return this.http
+        .patch<Club>(`${this.apiUrl}/${id}`, clubDto, {
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .pipe(map((club) => this.processShieldUrl(club)));
+    }
   }
 
   deleteClub(id: number): Observable<void> {

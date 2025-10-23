@@ -1,0 +1,169 @@
+<div class="event-form-page">
+  <!-- Header -->
+  <div class="page-header">
+    <a routerLink="/events" class="back-link">
+      <i class="bi bi-arrow-left"></i> Volver a Eventos
+    </a>
+    <h1>{{ isEdit ? 'Editar' : 'Nuevo' }} Evento</h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading && isEdit" class="loading-container">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando datos del evento...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading || !isEdit">
+    <div class="row">
+      <!-- Main Fields -->
+      <div class="col-md-8">
+        <!-- Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre del Evento *</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Ej: Primeros Auxilios"
+          />
+          <div
+            *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched"
+            class="text-danger mt-1"
+          >
+            <small>El nombre del evento es requerido</small>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="description"
+            rows="3"
+            placeholder="Descripción del evento (opcional)"
+          ></textarea>
+        </div>
+
+        <!-- Max Score -->
+        <div class="mb-3">
+          <label for="maxScore" class="form-label">Puntaje Máximo *</label>
+          <input
+            type="number"
+            class="form-control"
+            id="maxScore"
+            formControlName="maxScore"
+            min="1"
+          />
+          <div
+            *ngIf="eventForm.get('maxScore')?.invalid && eventForm.get('maxScore')?.touched"
+            class="text-danger mt-1"
+          >
+            <small>El puntaje máximo debe ser mayor a 0</small>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="mb-3">
+          <label for="type" class="form-label">Tipo de Evento *</label>
+          <select
+            class="form-select"
+            id="type"
+            formControlName="type"
+          >
+            <option value="REGULAR">Regular</option>
+          </select>
+          <div class="form-text">Por ahora solo está disponible el tipo "Regular"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="items-section mt-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Ítems del Evento</h3>
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          (click)="addItem()"
+        >
+          <i class="bi bi-plus-lg"></i>
+          Agregar Ítem
+        </button>
+      </div>
+
+      <div *ngIf="items.length === 0" class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        No hay ítems agregados. Haga clic en "Agregar Ítem" para comenzar.
+      </div>
+
+      <div formArrayName="items">
+        <div *ngFor="let item of items.controls; let i = index" class="item-card card mb-3">
+          <div class="card-body">
+            <div [formGroupName]="i" class="row align-items-center">
+              <div class="col-md-1 text-center">
+                <strong>{{ i + 1 }}</strong>
+              </div>
+              <div class="col-md-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  placeholder="Nombre del ítem (Ej: RCP - Reanimación Cardiopulmonar)"
+                />
+                <div
+                  *ngIf="item.get('name')?.invalid && item.get('name')?.touched"
+                  class="text-danger mt-1"
+                >
+                  <small>El nombre del ítem es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-1 text-end">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="removeItem(i)"
+                  title="Eliminar ítem"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons mt-4">
+      <button
+        type="button"
+        class="btn btn-secondary me-2"
+        (click)="cancel()"
+        [disabled]="isLoading"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading || eventForm.invalid"
+      >
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!isLoading" class="bi bi-check-circle me-2"></i>
+        {{ isEdit ? 'Actualizar' : 'Crear' }} Evento
+      </button>
+    </div>
+  </form>
+</div>
